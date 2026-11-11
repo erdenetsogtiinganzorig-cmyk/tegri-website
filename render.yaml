@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: tegri-website
+    runtime: static
+    buildCommand: ""
+    staticPublishPath: ./website
+    headers:
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=3600
