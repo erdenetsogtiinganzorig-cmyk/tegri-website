@@ -33,7 +33,7 @@ input,select,textarea{font-size:16px}
 .hdr.scrolled{background:#000;box-shadow:0 1px 0 #1c232b}
 .hdr.solid{position:sticky;background:#000}
 .hdr-in{display:flex;align-items:center;gap:16px 32px;padding:16px 24px;max-width:var(--max);margin:0 auto}
-.hdr-logo img{height:40px;width:auto}
+.hdr-logo img{height:46px;width:auto}
 .nav{display:flex;gap:28px;flex:1}
 .nav a{color:#fff;text-decoration:none;font-weight:600;font-size:14px}
 .nav a:hover{color:var(--cyan)}
@@ -41,7 +41,7 @@ input,select,textarea{font-size:16px}
 .menu-btn{display:none;width:44px;height:44px;margin-left:auto;border-radius:12px;border:1px solid rgba(255,255,255,.45);background:rgba(0,0,0,.2);color:#fff;cursor:pointer;align-items:center;justify-content:center}
 .drawer{display:none;position:fixed;inset:0;z-index:50;background:#000;color:#fff;padding:14px 16px 24px;flex-direction:column;gap:2px;overflow-y:auto;overscroll-behavior:contain}
 .drawer-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.drawer-top img{height:30px;width:auto}
+.drawer-top img{height:34px;width:auto}
 html.lock,html.lock body{overflow:hidden;touch-action:none}
 .drawer.open{display:flex}
 .drawer a{color:#fff;text-decoration:none;font-size:18px;font-weight:600;padding:14px 0;border-bottom:1px solid #1c232b}
@@ -216,7 +216,7 @@ a.ftr-line:hover span{text-decoration:underline}
   .nav,.hdr-phone,.hdr-cta{display:none}
   .menu-btn{display:inline-flex}
   .hdr-in{padding:14px 16px}
-  .hdr-logo img{height:30px}
+  .hdr-logo img{height:34px}
   .wrap{padding:0 16px}
   .hero{height:640px;min-height:0;max-height:none}
   .hero::after{background:linear-gradient(0deg,rgba(0,0,0,.85),rgba(0,0,0,.45) 45%,rgba(0,0,0,0) 70%)}
@@ -280,3 +280,20 @@ a.ftr-line:hover span{text-decoration:underline}
 @media (max-width:860px){.hero-cta .link-arrow{font-size:15px}}
 .monthly.range{font-size:clamp(24px,2.4vw,34px)}
 section[id]{scroll-margin-top:72px}
+
+.card-link{display:block}
+.card h3 a{color:inherit;text-decoration:none}
+.card h3 a:hover{color:var(--cyan-text)}
+.card-link:hover .card-img{opacity:.92}
+.calc-bar{display:none}
+@media (max-width:860px){
+  .calc-grid .p-opts{order:1}
+  .calc-grid .result{order:2}
+  .calc-grid .p-cond{order:3}
+  .calc-bar{display:flex;position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:30;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-radius:16px;background:var(--ink);color:#fff;text-decoration:none;box-shadow:0 10px 30px rgba(0,0,0,.28);transform:translateY(140%);opacity:0;transition:transform .25s,opacity .25s;pointer-events:none}
+  .calc-bar.show{transform:none;opacity:1;pointer-events:auto}
+  .cb-l{font-size:12px;color:#9fb0bf;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cb-v{font-family:var(--head);font-weight:700;font-size:17px;color:var(--cyan);white-space:nowrap}
+}
+.opt{white-space:nowrap}
+@media (max-width:860px){.opts .opt{padding:0 8px}}

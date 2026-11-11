@@ -148,7 +148,7 @@
         '<div class="hero-in"><div class="hero-txt"><p class="kicker">' + esc(c.kicker || c.kind) + '</p><h1>' + esc(c.name) + '</h1>' +
         (c.sub ? '<p class="hero-sub">' + esc(c.sub) + '</p>' : '') +
         (c.price ? '<p class="hero-price">' + fmt(c.price) + '</p>' : '') +
-        '<div class="hero-cta">' + (c.brochure ? '<a class="btn btn-cyan" href="' + esc(c.brochure) + '" target="_blank" rel="noopener">' + dlLabel(c) + '</a>' : '<a class="btn btn-cyan" href="#contact" data-intent="Танилцуулга авах">Танилцуулга авах</a>') +
+        '<div class="hero-cta">' + (c.brochure ? '<a class="btn btn-cyan" href="' + esc(c.brochure) + '" target="_blank" rel="noopener">' + dlLabel(c) + '</a>' : '<a class="btn btn-cyan" href="#contact" data-intent="Танилцуулга авах">' + dlLabel(c) + '</a>') +
         '<a class="link-arrow" href="' + carUrl(c) + '">Дэлгэрэнгүй үзэх ' + ARROW + '</a></div></div>' +
         (slides.length > 1 ? '<div class="hero-nav"><div class="tabs" role="tablist" aria-label="Загвар сонгох">' +
           slides.map(function (s, k) { return '<button class="tab" role="tab" type="button" aria-selected="' + (k === i) + '" data-k="' + k + '">' + esc(s.name.replace(/^BYD\s+/, '')) + '</button>'; }).join('') +
@@ -173,8 +173,8 @@
     var track = $('.track', sec);
     function drawCars() {
       track.innerHTML = cars.filter(function (c) { return filter === 'Бүгд' || c.tag === filter; }).map(function (c) {
-        return '<article class="card">' + (c.cardImg || c.heroDesktop ? '<img class="card-img" loading="lazy" src="' + esc(c.cardImg || c.heroDesktop) + '" alt="' + esc(c.name) + '">' : '<div class="card-ph">Зураг удахгүй</div>') +
-          '<div class="card-body"><span class="card-kind">' + esc(c.kind) + '</span><h3>' + esc(c.name) + '</h3>' +
+        return '<article class="card"><a class="card-link" href="' + carUrl(c) + '" tabindex="-1" aria-hidden="true">' + (c.cardImg || c.heroDesktop ? '<img class="card-img" loading="lazy" src="' + esc(c.cardImg || c.heroDesktop) + '" alt="">' : '<div class="card-ph">Зураг удахгүй</div>') + '</a>' +
+          '<div class="card-body"><span class="card-kind">' + esc(c.kind) + '</span><h3><a href="' + carUrl(c) + '">' + esc(c.name) + '</a></h3>' +
           '<div class="price-row"><p class="price">' + priceText(c) + '</p>' + statusHtml(c.status) + '</div>' +
           '<a class="btn btn-dark btn-block" href="' + carUrl(c) + '">Дэлгэрэнгүй</a></div></article>';
       }).join('');
@@ -259,7 +259,7 @@
       '<aside class="aside"><span class="kicker">' + esc(car.kicker || car.kind) + '</span><h1>' + esc(car.name) + '</h1>' +
       '<div><div class="small">Үнэ, НӨАТ орсон</div><div class="big">' + priceText(car) + '</div>' + teaser + '</div>' + statusHtml(car.status) +
       '<a class="btn btn-cyan btn-block" href="#contact" data-intent="Туршилтын жолоодлого">Туршилтын жолоодлого товлох</a>' +
-      (car.brochure ? '<a class="dl-btn" href="' + esc(car.brochure) + '" target="_blank" rel="noopener">' + dlLabel(car) + '</a>' : '<a class="dl-btn" href="#contact" data-intent="Танилцуулга авах">Танилцуулга авах</a>') +
+      (car.brochure ? '<a class="dl-btn" href="' + esc(car.brochure) + '" target="_blank" rel="noopener">' + dlLabel(car) + '</a>' : '<a class="dl-btn" href="#contact" data-intent="Танилцуулга авах">' + dlLabel(car) + '</a>') +
       '<ul><li>✓ ' + esc(C.gifts[0]) + '</li><li>✓ Бэлгийн багц машин бүрт</li><li>✓ Банк, ББСБ-ын зээл</li></ul></aside></div></div></section>' +
       ((car.keySpecs || []).length ? '<section class="keyspecs" aria-label="Гол үзүүлэлтүүд"><div class="keyspecs-in wrap">' + car.keySpecs.map(function (k) { return '<div><div class="ks-v">' + esc(k.value) + ' <small>' + esc(k.unit || '') + '</small></div><div class="ks-l">' + esc(k.label) + '</div></div>'; }).join('') + '</div></section>' : '') +
       (car.price && banks.length ? '<section class="calc" id="calc" aria-labelledby="calc-h"><div class="wrap"><h2 class="h2" id="calc-h">Зээлийн тооцоолуур</h2><p class="lead">Гэрээт банк, ББСБ-аа сонгоод урьдчилгаа, хугацаагаа тохируулна уу.</p><div class="banks" role="tablist" aria-label="Гэрээт байгууллагууд"></div><div class="calc-grid" id="calc-body"></div></div></section>' : '') +
@@ -284,6 +284,14 @@
   function calculator(car, banks) {
     var st = { b: 0, d: null, t: null, inc: 'Цалин', loan: 'idle' };
     var tabs = $('.banks'), body = $('#calc-body');
+    var bar = document.createElement('a');
+    bar.className = 'calc-bar'; bar.href = '#calc-result'; bar.setAttribute('aria-hidden', 'true'); bar.tabIndex = -1;
+    document.body.appendChild(bar);
+    var inCalc = false, resVisible = false;
+    function showBar() { bar.classList.toggle('show', inCalc && !resVisible); }
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) { inCalc = es[0].isIntersecting; showBar(); }, { rootMargin: '-120px 0px -40% 0px' }).observe($('#calc'));
+    }
     function drawTabs() {
       tabs.innerHTML = banks.map(function (b, k) {
         return '<button class="bank" type="button" role="tab" aria-selected="' + (k === st.b) + '" data-b="' + k + '"><span class="bank-mark" aria-hidden="true">' + (b.logo ? '<img src="' + esc(b.logo) + '" alt="">' : esc(b.mark || b.name.charAt(0))) + '</span><span class="bank-name">' + esc(b.name) + '</span></button>';
@@ -313,18 +321,24 @@
         loanPart = '<div class="done" role="status"><h3>Хүсэлтийг хүлээж авлаа</h3><p>Манай зээлийн зөвлөх ' + esc(C.callbackText) + ' залгаж, ' + esc(b.name) + '-нд бүрдүүлэх материалын жагсаалтыг илгээнэ.</p></div>';
       } else loanPart = '<button class="btn btn-cyan btn-block" type="button" data-loan="open">Энэ нөхцлөөр зээл хүсэх</button>';
       body.innerHTML =
-        '<div class="panel"><h3>' + esc(b.name) + ' — нөхцөл</h3><dl class="kv"><dt>Зээлийн төрөл</dt><dd>' + esc(b.type || '—') + '</dd><dt>Сарын хүү</dt><dd>' + rateText + '</dd><dt>Урьдчилгаа</dt><dd>' + Math.min.apply(null, b.downs) + '% – ' + Math.max.apply(null, b.downs) + '%</dd></dl>' +
+        '<div class="panel p-cond"><h3>' + esc(b.name) + ' — нөхцөл</h3><dl class="kv"><dt>Зээлийн төрөл</dt><dd>' + esc(b.type || '—') + '</dd><dt>Сарын хүү</dt><dd>' + rateText + '</dd><dt>Урьдчилгаа</dt><dd>' + Math.min.apply(null, b.downs) + '% – ' + Math.max.apply(null, b.downs) + '%</dd></dl>' +
         ((b.notes || []).length ? '<ul class="notes">' + b.notes.map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('') + '</ul>' : '') + '</div>' +
-        '<div class="panel"><strong id="il">Таны орлого</strong><div class="opts" role="group" aria-labelledby="il">' +
+        '<div class="panel p-opts"><strong id="il">Таны орлого</strong><div class="opts" role="group" aria-labelledby="il">' +
         INCOMES.map(function (x) { return '<button class="opt" type="button" aria-pressed="' + (x === st.inc) + '" data-inc="' + x + '">' + (x === 'Цалин' ? 'Цалингийн' : 'Бизнесийн') + '</button>'; }).join('') + '</div>' +
         '<div style="display:flex;justify-content:space-between;gap:12px"><strong id="dl">Урьдчилгаа</strong><strong>' + fmt(car.price * d / 100) + '</strong></div><div class="opts" role="group" aria-labelledby="dl">' +
         b.downs.map(function (x) { return '<button class="opt" type="button" aria-pressed="' + (x === d) + '" data-d="' + x + '">' + x + '%</button>'; }).join('') + '</div>' +
         (terms.length ? '<strong id="tl">Хугацаа</strong><div class="opts" role="group" aria-labelledby="tl">' +
         terms.map(function (x) { return '<button class="opt" type="button" aria-pressed="' + (x === t) + '" data-t="' + x + '">' + x + ' сар</button>'; }).join('') + '</div>' : '') +
         '<p class="fine">Нөхцөл нь жишээ. Эцсийн хүү, урьдчилгааг банк таны орлого, зээлийн түүхээр тогтооно.</p></div>' +
-        '<div class="result"><span style="font-size:14px;color:#0e5b70">Сарын төлбөр · ' + esc(b.name) + (r ? ' · ' + pct(r) : '') + '</span><span class="monthly' + (mMax > m + 1 ? ' range' : '') + '" aria-live="polite">' + money + '</span>' +
+        '<div class="result" id="calc-result"><span style="font-size:14px;color:#0e5b70">Сарын төлбөр · ' + esc(b.name) + (r ? ' · ' + pct(r) : '') + '</span><span class="monthly' + (mMax > m + 1 ? ' range' : '') + '" aria-live="polite">' + money + '</span>' +
         (mMax > m + 1 ? '<span class="fine" style="margin:0">Хүү таны зээлийн оноогоор ' + pct(r) + ' хооронд тогтоно.</span>' : '') +
         '<dl class="kv"><dt>Машины үнэ</dt><dd>' + fmt(car.price) + '</dd><dt>Урьдчилгаа</dt><dd>' + fmt(car.price * d / 100) + '</dd><dt>Зээлийн дүн</dt><dd>' + fmt(car.price * (1 - d / 100)) + '</dd></dl>' + loanPart + '</div>';
+      bar.innerHTML = '<span class="cb-l">Сарын төлбөр · ' + esc(b.name) + (r ? ' · ' + t + ' сар' : '') + '</span><span class="cb-v">' + money + '</span>';
+      if ('IntersectionObserver' in window) {
+        if (draw.ro) draw.ro.disconnect();
+        draw.ro = new IntersectionObserver(function (es) { resVisible = es[0].isIntersecting; showBar(); }, { threshold: 0.35 });
+        draw.ro.observe($('#calc-result'));
+      }
       var lf = $('#loanform');
       if (lf) lf.addEventListener('submit', function (e) {
         e.preventDefault();
