@@ -104,7 +104,7 @@ html.lock,html.lock body{overflow:hidden;touch-action:none}
 .showroom{padding:0 0 72px}
 .sr-box{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);background:#fff;border:1px solid var(--line);border-radius:24px;overflow:hidden}
 .sr-img{min-height:340px;background:#e4e7eb;position:relative}
-.sr-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.sr-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 60%}
 .sr-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#7b8794;font-size:14px;background:linear-gradient(135deg,#e9edf1,#d9dfe5)}
 .sr-ph svg{width:36px;height:36px}
 .sr-txt{padding:clamp(24px,3.6vw,48px);display:flex;flex-direction:column;gap:14px;align-items:flex-start;justify-content:center}

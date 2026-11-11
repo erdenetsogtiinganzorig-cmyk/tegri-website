@@ -14,8 +14,8 @@ window.TEGRI_CONFIG = {
   showroom: {
     title: 'Шоурүүмд зочлоорой',
     text: 'Машинуудыг биеэр үзэж, туршилтын жолоодлого хийх боломжтой. Манай зөвлөхүүд зээлийн нөхцөл, бэлгийн багцын талаар дэлгэрэнгүй танилцуулна.',
-    image: '',
-    mapsUrl: '',
+    image: 'assets/img/showroom.jpg',
+    mapsUrl: 'https://maps.app.goo.gl/eLEngHpFZNM3eZCJA',
     mapsQuery: 'UG Motors Ulaanbaatar',
     hours: ''
   }
