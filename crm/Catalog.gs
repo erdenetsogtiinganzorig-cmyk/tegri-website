@@ -92,6 +92,17 @@ function setupCatalog() {
   const cars = ensureSheet_(ss, SHEET_CARS, CAR_HEADERS);
   const banks = ensureSheet_(ss, SHEET_BANKS, BANK_HEADERS);
   cars.getRange(2, 5, 500, 1).setNumberFormat('#,##0');
+  banks.getRange(2, 6, 500, 2).setNumberFormat('@'); // "10, 20, 30"-ийг огноо гэж ойлгохоос сэргийлнэ
+  // Өмнө нь огноо болж хадгалагдсан урьдчилгаа/хугацааг анхны утгаар засна
+  if (banks.getLastRow() > 1) {
+    const n = banks.getLastRow() - 1, vals = banks.getRange(2, 1, n, 7).getValues();
+    vals.forEach((r, i) => {
+      const seed = CATALOG_SEED.banks.filter(b => b.id === String(r[0]))[0];
+      [5, 6].forEach(c => {
+        if (r[c] instanceof Date) banks.getRange(i + 2, c + 1).setValue(seed ? (c === 5 ? seed.downs : seed.terms).join(', ') : '');
+      });
+    });
+  }
   const now = new Date();
   if (cars.getLastRow() < 2) {
     CATALOG_SEED.cars.forEach(c => { c.updated = now; c.updatedBy = 'Тохиргоо'; cars.appendRow(carToRow_(cleanCar_(c))); });
