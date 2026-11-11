@@ -93,6 +93,16 @@
       '</div><div class="ftr-bottom"><span>© ' + new Date().getFullYear() + ' ' + esc(C.company) + '</span><span>tegrimotors.mn</span></div></div>';
     document.body.appendChild(f);
   }
+  /* Утгагүй мөр (жишээ нь "Хэмжээ ба жин") нь бүлгийн гарчиг болно */
+  function specGroups(list) {
+    var gs = [], g = null;
+    list.forEach(function (x) {
+      if (!x.value) { g = { name: x.label, rows: [] }; gs.push(g); return; }
+      if (!g) { g = { name: '', rows: [] }; gs.push(g); }
+      g.rows.push(x);
+    });
+    return gs.filter(function (x) { return x.rows.length; });
+  }
   function mapsUrl() { var SR = C.showroom || {}; return SR.mapsUrl || 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(SR.mapsQuery || C.address); }
   function dlLabel(c) { return DL + '<span>Танилцуулга татах (PDF)</span>'; }
   function statusHtml(s) { return s ? '<span class="status' + (s === 'Бэлэн' ? ' ok' : '') + '">' + esc(s) + '</span>' : ''; }
@@ -264,7 +274,9 @@
       ((car.keySpecs || []).length ? '<section class="keyspecs" aria-label="Гол үзүүлэлтүүд"><div class="keyspecs-in wrap">' + car.keySpecs.map(function (k) { return '<div><div class="ks-v">' + esc(k.value) + ' <small>' + esc(k.unit || '') + '</small></div><div class="ks-l">' + esc(k.label) + '</div></div>'; }).join('') + '</div></section>' : '') +
       (car.price && banks.length ? '<section class="calc" id="calc" aria-labelledby="calc-h"><div class="wrap"><h2 class="h2" id="calc-h">Зээлийн тооцоолуур</h2><p class="lead">Гэрээт банк, ББСБ-аа сонгоод урьдчилгаа, хугацаагаа тохируулна уу.</p><div class="banks" role="tablist" aria-label="Гэрээт байгууллагууд"></div><div class="calc-grid" id="calc-body"></div></div></section>' : '') +
       '<section class="gifts" aria-labelledby="gifts-h"><div class="wrap"><h2 class="h2" id="gifts-h" style="color:#fff">Машин бүрт багтана</h2><p>Нэмэлт төлбөргүй, машинтай хамт.</p><div class="gift-grid">' + C.gifts.map(function (g) { return '<div class="gift">' + CHECK + '<span>' + esc(g) + '</span></div>'; }).join('') + '</div></div></section>' +
-      ((car.specs || []).length ? '<section class="specs" aria-labelledby="specs-h"><div class="wrap"><h2 class="h2" id="specs-h">Техникийн үзүүлэлт</h2><table><tbody>' + car.specs.map(function (s) { return '<tr><th scope="row">' + esc(s.label) + '</th><td>' + esc(s.value) + '</td></tr>'; }).join('') + '</tbody></table></div></section>' : '') +
+      ((car.specs || []).length ? '<section class="specs" aria-labelledby="specs-h"><div class="wrap"><h2 class="h2" id="specs-h">Техникийн үзүүлэлт</h2><div class="spec-groups">' + specGroups(car.specs).map(function (g) {
+        return '<div class="spec-group">' + (g.name ? '<h3>' + esc(g.name) + '</h3>' : '') + '<table><tbody>' + g.rows.map(function (s) { return '<tr><th scope="row">' + esc(s.label) + '</th><td>' + esc(s.value) + '</td></tr>'; }).join('') + '</tbody></table></div>';
+      }).join('') + '</div></div></section>' : '') +
       '<section class="contact" id="contact" aria-labelledby="contact-h"></section>';
 
     function drawGal() {
@@ -290,7 +302,7 @@
     var inCalc = false, resVisible = false;
     function showBar() { bar.classList.toggle('show', inCalc && !resVisible); }
     if ('IntersectionObserver' in window) {
-      new IntersectionObserver(function (es) { inCalc = es[0].isIntersecting; showBar(); }, { rootMargin: '-120px 0px -40% 0px' }).observe($('#calc'));
+      new IntersectionObserver(function (es) { inCalc = es[0].isIntersecting; showBar(); }, { rootMargin: '-120px 0px -60% 0px' }).observe($('#calc'));
     }
     function drawTabs() {
       tabs.innerHTML = banks.map(function (b, k) {
@@ -333,7 +345,7 @@
         '<div class="result" id="calc-result"><span style="font-size:14px;color:#0e5b70">Сарын төлбөр · ' + esc(b.name) + (r ? ' · ' + pct(r) : '') + '</span><span class="monthly' + (mMax > m + 1 ? ' range' : '') + '" aria-live="polite">' + money + '</span>' +
         (mMax > m + 1 ? '<span class="fine" style="margin:0">Хүү таны зээлийн оноогоор ' + pct(r) + ' хооронд тогтоно.</span>' : '') +
         '<dl class="kv"><dt>Машины үнэ</dt><dd>' + fmt(car.price) + '</dd><dt>Урьдчилгаа</dt><dd>' + fmt(car.price * d / 100) + '</dd><dt>Зээлийн дүн</dt><dd>' + fmt(car.price * (1 - d / 100)) + '</dd></dl>' + loanPart + '</div>';
-      bar.innerHTML = '<span class="cb-l">Сарын төлбөр · ' + esc(b.name) + (r ? ' · ' + t + ' сар' : '') + '</span><span class="cb-v">' + money + '</span>';
+      bar.innerHTML = '<span class="cb-l">' + esc(b.name) + (r ? ' · ' + t + ' сар' : '') + '<small>Сарын төлбөр</small></span><span class="cb-v">' + money + '</span>';
       if ('IntersectionObserver' in window) {
         if (draw.ro) draw.ro.disconnect();
         draw.ro = new IntersectionObserver(function (es) { resVisible = es[0].isIntersecting; showBar(); }, { threshold: 0.35 });
