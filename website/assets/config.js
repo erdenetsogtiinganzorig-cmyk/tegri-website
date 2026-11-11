@@ -2,7 +2,7 @@
    API: Tegri CRM-ийн "Execute as: Me / Who has access: Anyone" deployment-ийн /exec холбоос.
    Хоосон бол сайт fallback.js доторх өгөгдлөөр ажиллаж, форм илгээгдэхгүй. */
 window.TEGRI_CONFIG = {
-  API: '',
+  API: 'https://script.google.com/macros/s/AKfycbydjPn3-QVZuFJD2XNXq1nLSIFksQWVzk2_Os9KsGMi9ZH_goLnHbKtBZT60rfo4esy/exec',
   company: 'Тэгри Волт ХХК',
   phones: ['9999-7069', '9999-8579', '8888-8701'],
   email: 'info@tegrimotors.mn',
