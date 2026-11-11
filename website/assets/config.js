@@ -17,6 +17,6 @@ window.TEGRI_CONFIG = {
     image: 'assets/img/showroom.jpg',
     mapsUrl: 'https://maps.app.goo.gl/eLEngHpFZNM3eZCJA',
     mapsQuery: 'UG Motors Ulaanbaatar',
-    hours: 'Да–Ба 10:00–19:00'
+    hours: 'Өдөр бүр 10:00–19:00'
   }
 };
