@@ -239,3 +239,4 @@ input,select,textarea{font-size:16px}
 .aside .status{align-self:flex-start}
 .hero-cta .link-arrow{white-space:nowrap}
 @media (max-width:860px){.hero-cta .link-arrow{font-size:15px}}
+.monthly.range{font-size:clamp(24px,2.4vw,34px)}

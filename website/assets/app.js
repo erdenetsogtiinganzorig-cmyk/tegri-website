@@ -177,13 +177,11 @@
     drawCars();
 
     // Зээлийн товч жишээ
-    var withPrice = cars.filter(function (c) { return c.price; });
-    var bank = data.banks[0];
-    var t = $('#loan');
-    if (withPrice.length && bank) {
-      var c = withPrice[0], d = bank.downs[0], term = bank.terms[bank.terms.length - 1];
-      t.innerHTML = '<div class="wrap"><div class="teaser-box"><div><h2>' + esc(c.name) + ' — сард <span style="color:var(--cyan-text)">≈ ' + fmt(pay(c.price, d, term, bank.rate)) + '</span>-өөр</h2>' +
-        '<p>' + esc(bank.name) + ', ' + d + '% урьдчилгаа, сарын ' + bank.rate + '%, ' + term + ' сар. Жишээ тооцоо, эцсийн нөхцөлийг банк тогтооно.</p></div>' +
+    var t = $('#loan'), offer = null, c = null;
+    cars.filter(function (x) { return x.price; }).some(function (x) { offer = bestOffer(x, data.banks); c = x; return offer; });
+    if (offer) {
+      t.innerHTML = '<div class="wrap"><div class="teaser-box"><div><h2>' + esc(c.name) + ' — сард <span style="color:var(--cyan-text)">≈ ' + fmt(offer.m) + '</span>-өөр</h2>' +
+        '<p>' + esc(offer.b.name) + ', ' + offer.d + '% урьдчилгаа, сарын ' + offer.r.min + '%, ' + offer.t + ' сар' + (offer.inc === 'Бизнес' ? ' (бизнесийн орлоготой)' : '') + '. Жишээ тооцоо, эцсийн нөхцөлийг банк тогтооно.</p></div>' +
         '<a class="btn btn-cyan" href="' + carUrl(c) + '#calc">Зээлээ тооцоолох</a></div></div>';
     } else t.remove();
 
@@ -195,6 +193,35 @@
     var P = price * (1 - down / 100), r = rate / 100;
     return P * r / (1 - Math.pow(1 + r, -term));
   }
+
+  /* Хүүгийн нөхцөл: орлогын төрөл, машины төрөл (EV/PHEV), хугацаанаас хамаарна */
+  var INCOMES = ['Цалин', 'Бизнес'];
+  function rateFor(b, car, inc, term) {
+    var rules = b.rules || [];
+    if (!rules.length) return { min: b.rate, max: b.rate };
+    var power = car.power === 'EV' ? 'EV' : 'PHEV', best = null;
+    rules.forEach(function (r) {
+      if ((r.inc === 'Бүгд' || r.inc === inc) && (r.car === 'Бүгд' || r.car === power) && r.max >= term && (!best || r.max < best.max)) best = r;
+    });
+    return best ? { min: best.rate, max: best.rateMax > best.rate ? best.rateMax : best.rate } : null;
+  }
+  function termsFor(b, car, inc) { return b.terms.filter(function (t) { return rateFor(b, car, inc, t); }); }
+  function bankFits(b, car) { return INCOMES.some(function (i) { return termsFor(b, car, i).length; }); }
+  /* Хамгийн бага сарын төлбөрийн жишээ: хамгийн бага урьдчилгаа биш, 20%-иас эхэлнэ (боломжтой бол) */
+  function bestOffer(car, banks) {
+    var best = null;
+    banks.forEach(function (b) {
+      if (!bankFits(b, car)) return;
+      var d = b.downs.indexOf(20) >= 0 ? 20 : b.downs[0];
+      INCOMES.forEach(function (inc) {
+        var ts = termsFor(b, car, inc); if (!ts.length) return;
+        var t = ts[ts.length - 1], r = rateFor(b, car, inc, t), m = pay(car.price, d, t, r.min);
+        if (!best || m < best.m) best = { m: m, b: b, d: d, t: t, r: r, inc: inc };
+      });
+    });
+    return best;
+  }
+  function pct(r) { return r.max > r.min ? r.min + '–' + r.max + '%' : r.min + '%'; }
 
   /* ---------- Машины дэлгэрэнгүй ---------- */
   function renderCar(data) {
@@ -209,8 +236,9 @@
     var gallery = (car.gallery || []).filter(function (g) { return g && g.url; });
     if (!gallery.length && (car.heroDesktop || car.cardImg)) gallery = [{ label: 'Гадна', url: car.heroDesktop || car.cardImg }];
     var gi = 0;
-    var bank0 = data.banks[0];
-    var teaser = car.price && bank0 ? '<span class="teaser-line">Зээлээр сард ≈ ' + fmt(pay(car.price, bank0.downs[0], bank0.terms[bank0.terms.length - 1], bank0.rate)) + '-өөс</span>' : '';
+    var banks = data.banks.filter(function (b) { return bankFits(b, car); });
+    var offer = car.price ? bestOffer(car, banks) : null;
+    var teaser = offer ? '<span class="teaser-line">Зээлээр сард ≈ ' + fmt(offer.m) + '-өөс</span>' : '';
 
     main.innerHTML =
       '<section class="top"><div class="wrap"><nav class="crumbs" aria-label="Хуудасны зам"><a href="index.html#cars">Машинууд</a> / ' + esc(car.name) + '</nav>' +
@@ -221,7 +249,7 @@
       (car.brochure ? '<a class="dl-btn" href="' + esc(car.brochure) + '" target="_blank" rel="noopener">⬇ Танилцуулга татах (PDF)</a>' : '<a class="dl-btn" href="#contact" data-intent="Танилцуулга авах">Танилцуулга авах</a>') +
       '<ul><li>✓ ' + esc(C.gifts[0]) + '</li><li>✓ Бэлгийн багц машин бүрт</li><li>✓ Банк, ББСБ-ын зээл</li></ul></aside></div></div></section>' +
       ((car.keySpecs || []).length ? '<section class="keyspecs" aria-label="Гол үзүүлэлтүүд"><div class="keyspecs-in wrap">' + car.keySpecs.map(function (k) { return '<div><div class="ks-v">' + esc(k.value) + ' <small>' + esc(k.unit || '') + '</small></div><div class="ks-l">' + esc(k.label) + '</div></div>'; }).join('') + '</div></section>' : '') +
-      (car.price && data.banks.length ? '<section class="calc" id="calc" aria-labelledby="calc-h"><div class="wrap"><h2 class="h2" id="calc-h">Зээлийн тооцоолуур</h2><p class="lead">Гэрээт банк, ББСБ-аа сонгоод урьдчилгаа, хугацаагаа тохируулна уу.</p><div class="banks" role="tablist" aria-label="Гэрээт байгууллагууд"></div><div class="calc-grid" id="calc-body"></div></div></section>' : '') +
+      (car.price && banks.length ? '<section class="calc" id="calc" aria-labelledby="calc-h"><div class="wrap"><h2 class="h2" id="calc-h">Зээлийн тооцоолуур</h2><p class="lead">Гэрээт банк, ББСБ-аа сонгоод урьдчилгаа, хугацаагаа тохируулна уу.</p><div class="banks" role="tablist" aria-label="Гэрээт байгууллагууд"></div><div class="calc-grid" id="calc-body"></div></div></section>' : '') +
       '<section class="gifts" aria-labelledby="gifts-h"><div class="wrap"><h2 class="h2" id="gifts-h" style="color:#fff">Машин бүрт багтана</h2><p>Нэмэлт төлбөргүй, машинтай хамт.</p><div class="gift-grid">' + C.gifts.map(function (g) { return '<div class="gift">' + CHECK + '<span>' + esc(g) + '</span></div>'; }).join('') + '</div></div></section>' +
       ((car.specs || []).length ? '<section class="specs" aria-labelledby="specs-h"><div class="wrap"><h2 class="h2" id="specs-h">Техникийн үзүүлэлт</h2><table><tbody>' + car.specs.map(function (s) { return '<tr><th scope="row">' + esc(s.label) + '</th><td>' + esc(s.value) + '</td></tr>'; }).join('') + '</tbody></table></div></section>' : '') +
       '<section class="contact" id="contact" aria-labelledby="contact-h"></section>';
@@ -235,13 +263,13 @@
     main.addEventListener('click', function (e) { var t = e.target.closest('[data-g]'); if (t) { gi = +t.getAttribute('data-g'); drawGal(); } });
     drawGal();
 
-    if (car.price && data.banks.length) calculator(car, data.banks);
+    if (car.price && banks.length) calculator(car, banks);
     contactForm($('#contact'), { cars: data.cars, car: car, title: car.name + ' — мэдээлэл авах' });
     footer();
   }
 
   function calculator(car, banks) {
-    var st = { b: 0, d: null, t: null, loan: 'idle' };
+    var st = { b: 0, d: null, t: null, inc: 'Цалин', loan: 'idle' };
     var tabs = $('.banks'), body = $('#calc-body');
     function drawTabs() {
       tabs.innerHTML = banks.map(function (b, k) {
@@ -250,12 +278,21 @@
     }
     function draw() {
       var b = banks[st.b];
+      var terms = termsFor(b, car, st.inc);
       var d = b.downs.indexOf(st.d) >= 0 ? st.d : b.downs[0];
-      var t = b.terms.indexOf(st.t) >= 0 ? st.t : b.terms[b.terms.length - 1];
-      var m = pay(car.price, d, t, b.rate);
+      var t = terms.indexOf(st.t) >= 0 ? st.t : terms[terms.length - 1];
+      var r = terms.length ? rateFor(b, car, st.inc, t) : null;
+      var m = r ? pay(car.price, d, t, r.min) : 0, mMax = r ? pay(car.price, d, t, r.max) : 0;
+      var money = r ? (mMax > m + 1 ? fmt(m) + ' – ' + fmt(mMax) : fmt(m)) : '—';
+      var allRates = [];
+      INCOMES.forEach(function (i) { termsFor(b, car, i).forEach(function (x) { var q = rateFor(b, car, i, x); allRates.push(q.min, q.max); }); });
+      var rateText = allRates.length ? pct({ min: Math.min.apply(null, allRates), max: Math.max.apply(null, allRates) }) : '—';
+      var other = st.inc === 'Цалин' ? 'Бизнес' : 'Цалин';
       var loanPart;
-      if (st.loan === 'open') {
-        loanPart = '<form class="loanform" id="loanform" novalidate><strong>Зээлийн хүсэлт</strong><span style="font-size:13px;color:var(--text2)">' + esc(car.name + ' · ' + b.name + ' · ' + d + '% урьдчилгаа · ' + t + ' сар · сард ' + fmt(m)) + '</span>' +
+      if (!r) loanPart = '<p class="fine" style="margin:0">' + esc(b.name) + ' ' + (st.inc === 'Цалин' ? 'цалингийн' : 'бизнесийн') + ' орлоготой хүнд энэ машинд зээл олгодоггүй.</p>' +
+        (termsFor(b, car, other).length ? '<button class="btn btn-cyan btn-block" type="button" data-inc="' + other + '">' + (other === 'Бизнес' ? 'Бизнесийн' : 'Цалингийн') + ' орлогоор тооцох</button>' : '');
+      else if (st.loan === 'open') {
+        loanPart = '<form class="loanform" id="loanform" novalidate><strong>Зээлийн хүсэлт</strong><span style="font-size:13px;color:var(--text2)">' + esc(car.name + ' · ' + b.name + ' · ' + (st.inc === 'Цалин' ? 'цалингийн' : 'бизнесийн') + ' орлого · ' + d + '% урьдчилгаа · ' + t + ' сар · сард ' + money) + '</span>' +
           '<label class="legend" for="lf-phone">Утасны дугаар *</label><input id="lf-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="8888 8888"><span class="err" hidden>8 оронтой дугаар оруулна уу</span>' +
           '<label class="legend" for="lf-name">Нэр</label><input id="lf-name" autocomplete="name" placeholder="Заавал биш">' +
           '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><button class="btn btn-ghost" type="button" data-loan="cancel">Болих</button><button class="btn btn-cyan" type="submit">Илгээх</button></div></form>';
@@ -263,27 +300,31 @@
         loanPart = '<div class="done" role="status"><h3>Хүсэлтийг хүлээж авлаа</h3><p>Манай зээлийн зөвлөх ' + esc(C.callbackText) + ' залгаж, ' + esc(b.name) + '-нд бүрдүүлэх материалын жагсаалтыг илгээнэ.</p></div>';
       } else loanPart = '<button class="btn btn-cyan btn-block" type="button" data-loan="open">Энэ нөхцлөөр зээл хүсэх</button>';
       body.innerHTML =
-        '<div class="panel"><h3>' + esc(b.name) + ' — нөхцөл</h3><dl class="kv"><dt>Зээлийн төрөл</dt><dd>' + esc(b.type || '—') + '</dd><dt>Сарын хүү</dt><dd>' + b.rate + '%</dd><dt>Урьдчилгаа</dt><dd>' + Math.min.apply(null, b.downs) + '% – ' + Math.max.apply(null, b.downs) + '%</dd><dt>Хугацаа</dt><dd>' + Math.min.apply(null, b.terms) + ' – ' + Math.max.apply(null, b.terms) + ' сар</dd></dl>' +
+        '<div class="panel"><h3>' + esc(b.name) + ' — нөхцөл</h3><dl class="kv"><dt>Зээлийн төрөл</dt><dd>' + esc(b.type || '—') + '</dd><dt>Сарын хүү</dt><dd>' + rateText + '</dd><dt>Урьдчилгаа</dt><dd>' + Math.min.apply(null, b.downs) + '% – ' + Math.max.apply(null, b.downs) + '%</dd></dl>' +
         ((b.notes || []).length ? '<ul class="notes">' + b.notes.map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('') + '</ul>' : '') + '</div>' +
-        '<div class="panel"><div style="display:flex;justify-content:space-between;gap:12px"><strong id="dl">Урьдчилгаа</strong><strong>' + fmt(car.price * d / 100) + '</strong></div><div class="opts" role="group" aria-labelledby="dl">' +
+        '<div class="panel"><strong id="il">Таны орлого</strong><div class="opts" role="group" aria-labelledby="il">' +
+        INCOMES.map(function (x) { return '<button class="opt" type="button" aria-pressed="' + (x === st.inc) + '" data-inc="' + x + '">' + (x === 'Цалин' ? 'Цалингийн' : 'Бизнесийн') + '</button>'; }).join('') + '</div>' +
+        '<div style="display:flex;justify-content:space-between;gap:12px"><strong id="dl">Урьдчилгаа</strong><strong>' + fmt(car.price * d / 100) + '</strong></div><div class="opts" role="group" aria-labelledby="dl">' +
         b.downs.map(function (x) { return '<button class="opt" type="button" aria-pressed="' + (x === d) + '" data-d="' + x + '">' + x + '%</button>'; }).join('') + '</div>' +
-        '<strong id="tl">Хугацаа</strong><div class="opts" role="group" aria-labelledby="tl">' +
-        b.terms.map(function (x) { return '<button class="opt" type="button" aria-pressed="' + (x === t) + '" data-t="' + x + '">' + x + ' сар</button>'; }).join('') + '</div>' +
+        (terms.length ? '<strong id="tl">Хугацаа</strong><div class="opts" role="group" aria-labelledby="tl">' +
+        terms.map(function (x) { return '<button class="opt" type="button" aria-pressed="' + (x === t) + '" data-t="' + x + '">' + x + ' сар</button>'; }).join('') + '</div>' : '') +
         '<p class="fine">Нөхцөл нь жишээ. Эцсийн хүү, урьдчилгааг банк таны орлого, зээлийн түүхээр тогтооно.</p></div>' +
-        '<div class="result"><span style="font-size:14px;color:#0e5b70">Сарын төлбөр · ' + esc(b.name) + '</span><span class="monthly" aria-live="polite">' + fmt(m) + '</span>' +
+        '<div class="result"><span style="font-size:14px;color:#0e5b70">Сарын төлбөр · ' + esc(b.name) + (r ? ' · ' + pct(r) : '') + '</span><span class="monthly' + (mMax > m + 1 ? ' range' : '') + '" aria-live="polite">' + money + '</span>' +
+        (mMax > m + 1 ? '<span class="fine" style="margin:0">Хүү таны зээлийн оноогоор ' + pct(r) + ' хооронд тогтоно.</span>' : '') +
         '<dl class="kv"><dt>Машины үнэ</dt><dd>' + fmt(car.price) + '</dd><dt>Урьдчилгаа</dt><dd>' + fmt(car.price * d / 100) + '</dd><dt>Зээлийн дүн</dt><dd>' + fmt(car.price * (1 - d / 100)) + '</dd></dl>' + loanPart + '</div>';
       var lf = $('#loanform');
       if (lf) lf.addEventListener('submit', function (e) {
         e.preventDefault();
         var p = $('#lf-phone').value;
         if (!phoneOk(p)) { $('.err', lf).hidden = false; $('#lf-phone').focus(); return; }
-        sendLead({ type: 'Зээлийн хүсэлт', phone: p, name: $('#lf-name').value, model: car.name, payment: 'Зээл', bank: b.name, down: d + '%', term: t + ' сар', monthly: fmt(m) })
+        sendLead({ type: 'Зээлийн хүсэлт', phone: p, name: $('#lf-name').value, model: car.name, payment: 'Зээл', bank: b.name + ' (' + (st.inc === 'Цалин' ? 'цалингийн' : 'бизнесийн') + ' орлого)', down: d + '%', term: t + ' сар', monthly: money })
           .then(function () { st.loan = 'sent'; draw(); });
       });
     }
     tabs.addEventListener('click', function (e) { var x = e.target.closest('[data-b]'); if (x) { st.b = +x.getAttribute('data-b'); if (st.loan === 'sent') st.loan = 'idle'; drawTabs(); draw(); } });
     body.addEventListener('click', function (e) {
-      var x = e.target.closest('[data-d],[data-t],[data-loan]'); if (!x) return;
+      var x = e.target.closest('[data-d],[data-t],[data-loan],[data-inc]'); if (!x) return;
+      if (x.hasAttribute('data-inc')) { st.inc = x.getAttribute('data-inc'); if (st.loan === 'sent') st.loan = 'idle'; }
       if (x.hasAttribute('data-d')) st.d = +x.getAttribute('data-d');
       if (x.hasAttribute('data-t')) st.t = +x.getAttribute('data-t');
       if (x.hasAttribute('data-loan')) st.loan = x.getAttribute('data-loan') === 'open' ? 'open' : 'idle';

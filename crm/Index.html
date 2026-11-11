@@ -106,6 +106,10 @@ h3{font-size:14px;margin:22px 0 8px}
 .chk input{width:20px;height:20px;flex:0 0 20px}
 .btn.del{background:none;color:var(--red);border:1px solid #fecaca;margin-top:10px}
 .busy{opacity:.6;pointer-events:none}
+.rule{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 28px;gap:6px;padding:8px 0;border-bottom:1px dashed var(--line);align-items:center}
+.rule select,.rule input{padding:8px 6px}
+.rule .ln{grid-column:1/-1;display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);flex-wrap:wrap}
+.rule .ln input{width:64px;flex:0 0 64px}
 </style>
 </head>
 <body>
@@ -154,7 +158,7 @@ const Demo = (() => {
   ];
   const logs = { T2: [{at: d(-2) + ' 15:40', who: 'Ганзориг', type: 'Тэмдэглэл', text: 'Seal 5-ын цагаан өнгө сонирхож байна. Бямба гарагт шоурүүмд ирнэ гэсэн.'}] };
   const log = (id, who, type, text) => { (logs[id] = logs[id] || []).unshift({at: now(), who, type, text}); };
-  const CATD = Object.assign({ statuses: ['Бэлэн', 'Тун удахгүй', 'Захиалгаар', 'Зарагдсан'] }, {"cars": [{"id": "sealion-06-dm-i-pro", "name": "BYD Sealion 06 DM-i Pro", "kind": "SUV · Plug-in hybrid", "tag": "SUV", "price": "", "status": "Тун удахгүй", "featured": true, "order": 1, "kicker": "Шинэ · 0 км · Plug-in hybrid SUV", "sub": "Цахилгаан бензин хосолсон дунд оврын SUV", "heroDesktop": "assets/img/sealion06-pro-desktop.jpg", "heroMobile": "assets/img/sealion06-pro-mobile.jpg", "cardImg": "assets/img/sealion06-pro-card.jpg", "gallery": [{"label": "Гадна", "url": "assets/img/sealion06-pro-desktop.jpg"}], "keySpecs": [], "specs": [], "brochure": "", "visible": true}, {"id": "seal-5", "name": "BYD Seal 5", "kind": "Седан · Plug-in hybrid", "tag": "Седан", "price": 57000000, "status": "Бэлэн", "featured": true, "order": 2, "kicker": "Шинэ · 0 км · Plug-in hybrid седан", "sub": "Цахилгаан бензин хосолсон седан", "heroDesktop": "", "heroMobile": "", "cardImg": "", "gallery": [], "keySpecs": [{"value": "212", "unit": "м.х", "label": "Системийн нийт хүч"}, {"value": "100", "unit": "км", "label": "Зөвхөн цахилгаанаар (WLTP)"}, {"value": "1.7", "unit": "л", "label": "100 км-т зарцуулах бензин"}, {"value": "7.5", "unit": "сек", "label": "0–100 км/ц"}], "specs": [{"label": "Хөдөлгүүр", "value": "1.5 л бензин + цахилгаан мотор (DM-i)"}, {"label": "Батарей", "value": "18.3 кВт·ц, LFP (Blade)"}, {"label": "Урт × өргөн × өндөр", "value": "4780 × 1837 × 1515 мм"}, {"label": "Суудал", "value": "5"}], "brochure": "", "visible": true}, {"id": "yuan-up", "name": "BYD Yuan Up", "kind": "Кроссовер · Цахилгаан", "tag": "Цахилгаан", "price": "", "status": "Бэлэн", "featured": true, "order": 3, "kicker": "Шинэ · 0 км · Цахилгаан", "sub": "Хотод зориулсан цэвэр цахилгаан кроссовер", "heroDesktop": "", "heroMobile": "", "cardImg": "", "gallery": [], "keySpecs": [], "specs": [], "brochure": "", "visible": true}, {"id": "ti-7", "name": "BYD Ti 7", "kind": "SUV", "tag": "SUV", "price": "", "status": "Бэлэн", "featured": true, "order": 4, "kicker": "Шинэ · 0 км · SUV", "sub": "Аялал, гэр бүлд зориулсан том оврын SUV", "heroDesktop": "", "heroMobile": "", "cardImg": "", "gallery": [], "keySpecs": [], "specs": [], "brochure": "", "visible": true}, {"id": "sealion-06-dm-i", "name": "BYD Sealion 06 DM-i", "kind": "SUV · Plug-in hybrid · Цагаан саарал", "tag": "SUV", "price": "", "status": "Тун удахгүй", "featured": true, "order": 5, "kicker": "Тун удахгүй · Plug-in hybrid SUV", "sub": "Цагаан саарал өнгө · plug-in hybrid SUV", "heroDesktop": "", "heroMobile": "", "cardImg": "", "gallery": [], "keySpecs": [], "specs": [], "brochure": "", "visible": true}], "banks": [{"id": "khan", "name": "Хаан банк", "mark": "Х", "type": "Ногоон зээл", "rate": 1.25, "downs": [10, 20, 30, 40], "terms": [24, 36, 48, 60, 72, 84, 96], "notes": ["Цахилгаан ба хосолмол машинд"], "logo": "", "order": 1, "visible": true}, {"id": "golomt", "name": "Голомт банк", "mark": "Г", "type": "Ногоон зээл", "rate": 1.3, "downs": [10, 20, 30], "terms": [24, 36, 48, 60, 72, 84, 96], "notes": ["Цахилгаан ба хосолмол машинд"], "logo": "", "order": 2, "visible": true}, {"id": "tdb", "name": "Төрийн банк", "mark": "Т", "type": "Ногоон зээл", "rate": 1.3, "downs": [10, 20, 30], "terms": [36, 48, 60, 72, 84, 96], "notes": ["Цахилгаан ба хосолмол машинд"], "logo": "", "order": 3, "visible": true}, {"id": "tdb-leasing", "name": "Төрийн банк — санхүүгийн түрээс", "mark": "ТЛ", "type": "Санхүүгийн түрээс", "rate": 1.3, "downs": [10, 20, 30], "terms": [24, 36, 48, 60], "notes": [], "logo": "", "order": 4, "visible": true}, {"id": "arig", "name": "Ариг банк", "mark": "А", "type": "Автомашины зээл", "rate": 1.3, "downs": [10, 20, 30], "terms": [24, 36, 48, 60, 72], "notes": [], "logo": "", "order": 5, "visible": true}, {"id": "bers", "name": "Бэрс ББСБ", "mark": "Б", "type": "ББСБ-ын зээл", "rate": 1.3, "downs": [20, 30, 40], "terms": [12, 24, 36, 48], "notes": [], "logo": "", "order": 6, "visible": true}]});
+  const CATD = Object.assign({ statuses: ['Бэлэн', 'Тун удахгүй', 'Захиалгаар', 'Зарагдсан'] }, {"cars": [{"id": "sealion-06-dm-i-pro", "name": "BYD Sealion 06 DM-i Pro", "kind": "SUV · Plug-in hybrid", "tag": "SUV", "price": "", "status": "Тун удахгүй", "featured": true, "order": 1, "kicker": "Шинэ · 0 км · Plug-in hybrid SUV", "sub": "Цахилгаан бензин хосолсон дунд оврын SUV", "heroDesktop": "assets/img/sealion06-pro-desktop.jpg", "heroMobile": "assets/img/sealion06-pro-mobile.jpg", "cardImg": "assets/img/sealion06-pro-card.jpg", "gallery": [{"label": "Гадна", "url": "assets/img/sealion06-pro-desktop.jpg"}], "keySpecs": [], "specs": [], "brochure": "", "visible": true, "power": "PHEV"}, {"id": "seal-5", "name": "BYD Seal 5", "kind": "Седан · Plug-in hybrid", "tag": "Седан", "price": 57000000, "status": "Бэлэн", "featured": true, "order": 2, "kicker": "Шинэ · 0 км · Plug-in hybrid седан", "sub": "Цахилгаан бензин хосолсон седан", "heroDesktop": "", "heroMobile": "", "cardImg": "", "gallery": [], "keySpecs": [{"value": "212", "unit": "м.х", "label": "Системийн нийт хүч"}, {"value": "100", "unit": "км", "label": "Зөвхөн цахилгаанаар (WLTP)"}, {"value": "1.7", "unit": "л", "label": "100 км-т зарцуулах бензин"}, {"value": "7.5", "unit": "сек", "label": "0–100 км/ц"}], "specs": [{"label": "Хөдөлгүүр", "value": "1.5 л бензин + цахилгаан мотор (DM-i)"}, {"label": "Батарей", "value": "18.3 кВт·ц, LFP (Blade)"}, {"label": "Урт × өргөн × өндөр", "value": "4780 × 1837 × 1515 мм"}, {"label": "Суудал", "value": "5"}], "brochure": "", "visible": true, "power": "PHEV"}, {"id": "yuan-up", "name": "BYD Yuan Up", "kind": "Кроссовер · Цахилгаан", "tag": "Цахилгаан", "price": "", "status": "Бэлэн", "featured": true, "order": 3, "kicker": "Шинэ · 0 км · Цахилгаан", "sub": "Хотод зориулсан цэвэр цахилгаан кроссовер", "heroDesktop": "", "heroMobile": "", "cardImg": "", "gallery": [], "keySpecs": [], "specs": [], "brochure": "", "visible": true, "power": "EV"}, {"id": "ti-7", "name": "BYD Ti 7", "kind": "SUV", "tag": "SUV", "price": "", "status": "Бэлэн", "featured": true, "order": 4, "kicker": "Шинэ · 0 км · SUV", "sub": "Аялал, гэр бүлд зориулсан том оврын SUV", "heroDesktop": "", "heroMobile": "", "cardImg": "", "gallery": [], "keySpecs": [], "specs": [], "brochure": "", "visible": true, "power": "PHEV"}, {"id": "sealion-06-dm-i", "name": "BYD Sealion 06 DM-i", "kind": "SUV · Plug-in hybrid · Цагаан саарал", "tag": "SUV", "price": "", "status": "Тун удахгүй", "featured": true, "order": 5, "kicker": "Тун удахгүй · Plug-in hybrid SUV", "sub": "Цагаан саарал өнгө · plug-in hybrid SUV", "heroDesktop": "", "heroMobile": "", "cardImg": "", "gallery": [], "keySpecs": [], "specs": [], "brochure": "", "visible": true, "power": "PHEV"}], "banks": [{"id": "golomt", "name": "Голомт банк", "mark": "Г", "type": "Ногоон зээл", "rate": 1.3, "downs": [20, 30, 40, 50, 60, 70], "terms": [30, 36, 48, 60, 72, 84, 96], "rules": [{"inc": "Цалин", "max": 30, "car": "Бүгд", "rate": 1.3, "rateMax": 1.6}, {"inc": "Бизнес", "max": 96, "car": "Бүгд", "rate": 1.3, "rateMax": 1.6}], "notes": ["Урьдчилгаа 20%-аас. Үл хөдлөх хөрөнгө барьцаалбал урьдчилгаагүй.", "Хүү 1.3–1.6%, зээлдэгчийн скорингоос хамаарна.", "Цалингийн орлоготой 30 сар хүртэл, бизнесийн орлоготой 96 сар хүртэл."], "logo": "", "visible": true, "order": 1}, {"id": "tdb", "name": "Төрийн банк", "mark": "Т", "type": "Ногоон зээл", "rate": 1.3, "downs": [0, 10, 20, 30, 40, 50, 60, 70], "terms": [30, 36, 48, 60, 72, 84, 96], "rules": [{"inc": "Цалин", "max": 30, "car": "EV", "rate": 1.3, "rateMax": ""}, {"inc": "Цалин", "max": 30, "car": "PHEV", "rate": 1.6, "rateMax": ""}, {"inc": "Бизнес", "max": 96, "car": "EV", "rate": 1.3, "rateMax": ""}, {"inc": "Бизнес", "max": 96, "car": "PHEV", "rate": 1.6, "rateMax": ""}], "notes": ["Урьдчилгаагүй (0%) авах боломжтой.", "Хүү: цэвэр цахилгаан (EV) 1.3%, хосолмол (PHEV) 1.6%.", "Цалингийн орлоготой 30 сар хүртэл, бизнесийн орлоготой (бизнесдээ ашиглах) 96 сар хүртэл."], "logo": "", "visible": true, "order": 2}, {"id": "tdb-leasing", "name": "Төрийн банк — санхүүгийн түрээс", "mark": "ТЛ", "type": "Санхүүгийн түрээс", "rate": 1.2, "downs": [10, 20, 30, 40, 50, 60, 70], "terms": [30, 36, 48, 60, 72, 84, 96], "rules": [{"inc": "Бизнес", "max": 96, "car": "EV", "rate": 1.2, "rateMax": ""}], "notes": ["Зөвхөн бизнесийн орлоготой, цэвэр цахилгаан (EV) машинд.", "Урьдчилгаа 10–20%-аас, хүү 1.2%, 96 сар хүртэл.", "Зөвхөн Хүннү Моллын эсрэг талд байрлах Бэлманто салбар дээр судлагдана."], "logo": "", "visible": true, "order": 3}, {"id": "khan", "name": "Хаан банк", "mark": "Х", "type": "Ногоон зээл", "rate": 1.3, "downs": [10, 20, 30, 40, 50, 60, 70], "terms": [30, 36, 48, 60, 72, 84, 96], "rules": [{"inc": "Цалин", "max": 30, "car": "Бүгд", "rate": 1.35, "rateMax": ""}, {"inc": "Цалин", "max": 60, "car": "Бүгд", "rate": 1.4, "rateMax": ""}, {"inc": "Бизнес", "max": 96, "car": "Бүгд", "rate": 1.3, "rateMax": ""}], "notes": ["Урьдчилгаа 10%-аас.", "Цалингийн орлоготой: 30 сар хүртэл 1.35%, 31–60 сар 1.4%.", "Бизнесийн орлоготой: 96 сар хүртэл 1.3%."], "logo": "", "visible": true, "order": 4}, {"id": "arig", "name": "Ариг банк", "mark": "А", "type": "Автомашины зээл", "rate": 1.3, "downs": [10, 20, 30], "terms": [24, 36, 48, 60, 72], "rules": [], "notes": ["Нөхцөл бөглөгдөөгүй"], "logo": "", "visible": false, "order": 5}, {"id": "bers", "name": "Бэрс ББСБ", "mark": "Б", "type": "ББСБ-ын зээл", "rate": 1.3, "downs": [20, 30, 40], "terms": [12, 24, 36, 48], "rules": [], "notes": ["Нөхцөл бөглөгдөөгүй"], "logo": "", "visible": false, "order": 6}]});
   CATD.cars.forEach(c => { c.price = c.price || null; });
   const slugD = n => String(n).toLowerCase().replace(/[^a-z0-9]+/g, '-') || ('x' + Date.now());
   const numsD = v => String(v).split(/[,\s]+/).map(Number).filter(n => n > 0);
@@ -178,7 +182,7 @@ const Demo = (() => {
     apiCatalog: () => CATD,
     apiSaveCar: o => upd(CATD.cars, Object.assign({}, o, { price: Number(o.price) || null, id: o.id || slugD(o.name) })),
     apiDeleteCar: id => (CATD.cars = CATD.cars.filter(x => x.id !== id)),
-    apiSaveBank: o => upd(CATD.banks, Object.assign({}, o, { id: o.id || slugD(o.name), downs: numsD(o.downs), terms: numsD(o.terms), notes: String(o.notes || '').split('\n').filter(Boolean) })),
+    apiSaveBank: o => upd(CATD.banks, Object.assign({}, o, { rules: o.rules || [], id: o.id || slugD(o.name), downs: numsD(o.downs), terms: numsD(o.terms), notes: String(o.notes || '').split('\n').filter(Boolean) })),
     apiDeleteBank: id => (CATD.banks = CATD.banks.filter(x => x.id !== id)),
     apiUpload: (name, mime, b64) => 'https://demo.local/' + name
   };
@@ -384,7 +388,7 @@ function renderCat() {
   } else {
     $('#cat').innerHTML = '<div class="cat-note">Зээлийн тооцоолуурт харагдах банк, ББСБ. Хүү нь сарын хүү (%).</div>' +
       (CAT.banks.map(b => `<div class="ccard" data-id="${esc(b.id)}"><div class="th logo" style="${bg(b.logo)}">${isUrl(b.logo) ? '' : esc(b.mark || '')}</div>
-        <div class="t"><div class="nm">${esc(b.name)}${off(b)}</div><div class="meta">${esc(b.type)} · ${b.rate}% / сар</div>
+        <div class="t"><div class="nm">${esc(b.name)}${off(b)}</div><div class="meta">${esc(b.type)} · ${rateRange(b)} / сар</div>
         <div class="meta">Урьдчилгаа ${b.downs.join(', ')}% · ${b.terms.join(', ')} сар</div></div></div>`).join('') || '<div class="empty">Банк алга</div>');
   }
 }
@@ -409,7 +413,7 @@ function ksRows(list) {
 
 function openCar(id) {
   const c = id ? CAT.cars.find(x => x.id === id) : { id: '', name: '', kind: '', tag: '', price: '', status: 'Бэлэн', visible: true, featured: true,
-    order: (CAT.cars.length ? Math.max(...CAT.cars.map(x => x.order)) : 0) + 1, kicker: 'Шинэ · 0 км', sub: '', heroDesktop: '', heroMobile: '', cardImg: '', gallery: [], keySpecs: [], specs: [], brochure: '' };
+    order: (CAT.cars.length ? Math.max(...CAT.cars.map(x => x.order)) : 0) + 1, kicker: 'Шинэ · 0 км', sub: '', power: 'PHEV', heroDesktop: '', heroMobile: '', cardImg: '', gallery: [], keySpecs: [], specs: [], brochure: '' };
   if (!c) return;
   curItem = c.id || null;
   const tags = Array.from(new Set(['SUV', 'Седан', 'Цахилгаан', 'Hybrid'].concat(CAT.cars.map(x => x.tag).filter(Boolean))));
@@ -419,6 +423,7 @@ function openCar(id) {
       <div class="full"><label>Нэр *</label><input id="c_name" value="${esc(c.name)}" placeholder="BYD Seal 5"></div>
       <div><label>Үнэ (₮)</label><input id="c_price" inputmode="numeric" value="${c.price ? Number(c.price).toLocaleString('en-US') : ''}" placeholder="57,000,000"></div>
       <div><label>Төлөв</label><select id="c_status">${opt(CAT.statuses, c.status)}</select></div>
+      <div><label>Хөдөлгүүр (хүүд нөлөөлнө)</label><select id="c_power"><option value="PHEV" ${c.power !== 'EV' ? 'selected' : ''}>Хосолмол (PHEV)</option><option value="EV" ${c.power === 'EV' ? 'selected' : ''}>Цэвэр цахилгаан (EV)</option></select></div>
       <div><label>Төрөл</label><input id="c_kind" value="${esc(c.kind)}" placeholder="Седан · Plug-in hybrid"></div>
       <div><label>Шүүлтүүрийн ангилал</label><input id="c_tag" list="taglist" value="${esc(c.tag)}"><datalist id="taglist">${tags.map(t => `<option value="${esc(t)}">`).join('')}</datalist></div>
       <div class="full"><label>Баннерын дээд мөр</label><input id="c_kicker" value="${esc(c.kicker)}"></div>
@@ -459,6 +464,27 @@ function refreshPdf(url) {
   box.innerHTML = url ? '<a class="tel" href="' + esc(url) + '" target="_blank">PDF нээх</a> · хадгалахаа мартуузай' : 'Оруулаагүй (хадгалахад хасагдана)';
 }
 
+const INC_OPTS = [['Бүгд', 'Бүх орлого'], ['Цалин', 'Цалин'], ['Бизнес', 'Бизнес']];
+const CAR_OPTS = [['Бүгд', 'Бүх машин'], ['EV', 'EV'], ['PHEV', 'PHEV']];
+const sel = (cls, opts, v) => `<select class="${cls}">${opts.map(o => `<option value="${o[0]}" ${o[0] === v ? 'selected' : ''}>${o[1]}</option>`).join('')}</select>`;
+function ruleRow(r) {
+  r = r || { inc: 'Бүгд', max: 96, car: 'Бүгд', rate: '', rateMax: '' };
+  return `<div class="rule">${sel('r-inc', INC_OPTS, r.inc)}${sel('r-car', CAR_OPTS, r.car)}<button type="button" class="sbtn rm" data-rrm aria-label="Нөхцөл хасах">×</button>
+    <div class="ln"><input class="r-max" inputmode="numeric" value="${esc(r.max)}" aria-label="Хэдэн сар хүртэл"> сар хүртэл · хүү <input class="r-rate" inputmode="decimal" value="${esc(r.rate)}" aria-label="Хүү"> – <input class="r-rmax" inputmode="decimal" value="${esc(r.rateMax || '')}" aria-label="Дээд хүү (заавал биш)"> %</div></div>`;
+}
+function collectRules() {
+  return Array.from(document.querySelectorAll('#rules .rule')).map(x => ({
+    inc: x.querySelector('.r-inc').value, max: Number(x.querySelector('.r-max').value) || 0, car: x.querySelector('.r-car').value,
+    rate: Number(x.querySelector('.r-rate').value.replace(',', '.')) || 0, rateMax: Number(x.querySelector('.r-rmax').value.replace(',', '.')) || ''
+  })).filter(r => r.rate > 0 && r.max > 0);
+}
+function rateRange(b) {
+  const rs = (b.rules || []).reduce((a, r) => a.concat([r.rate, r.rateMax || r.rate]), []);
+  if (!rs.length) return b.rate + '%';
+  const lo = Math.min(...rs), hi = Math.max(...rs);
+  return hi > lo ? lo + '–' + hi + '%' : lo + '%';
+}
+
 function openBank(id) {
   const b = id ? CAT.banks.find(x => x.id === id) : { id: '', name: '', mark: '', type: 'Автомашины зээл', rate: '', downs: [10, 20, 30], terms: [24, 36, 48, 60], notes: [], logo: '', visible: true,
     order: (CAT.banks.length ? Math.max(...CAT.banks.map(x => x.order)) : 0) + 1 };
@@ -469,7 +495,11 @@ function openBank(id) {
     <div class="grid">
       <div class="full"><label>Нэр *</label><input id="b_name" value="${esc(b.name)}" placeholder="Хаан банк"></div>
       <div><label>Зээлийн төрөл</label><input id="b_type" value="${esc(b.type)}"></div>
-      <div><label>Сарын хүү (%) *</label><input id="b_rate" inputmode="decimal" value="${b.rate}" placeholder="1.25"></div>
+      <div><label>Сарын хүү (%) — нөхцөлгүй үед</label><input id="b_rate" inputmode="decimal" value="${b.rate}" placeholder="1.25"></div>
+      <div class="full"><label>Хүүгийн нөхцөл</label>
+        <div class="hint" style="margin:0 0 6px">Нөхцөл бүрт орлогын төрөл, машин, хэдэн сар хүртэл, хүүг бичнэ. Хүү хязгаартай бол (1.3–1.6%) хоёр дахь нүдэнд дээд хүүг бичнэ. Аль ч нөхцөлд тохирохгүй хугацаа, машин сайтад гарахгүй.</div>
+        <div id="rules">${(b.rules || []).map(ruleRow).join('')}</div>
+        <button type="button" class="sbtn" id="ruleAdd">+ Нөхцөл нэмэх</button></div>
       <div class="full"><label>Урьдчилгааны сонголт (%) *</label><input id="b_downs" inputmode="numeric" value="${b.downs.join(', ')}" placeholder="10, 20, 30"></div>
       <div class="full"><label>Хугацааны сонголт (сар) *</label><input id="b_terms" inputmode="numeric" value="${b.terms.join(', ')}" placeholder="24, 36, 48, 60"></div>
       <div class="full"><label>Нөхцөл (мөр бүрт нэг)</label><textarea id="b_notes" placeholder="Цахилгаан ба хосолмол машинд&#10;Цалингийн зээлдэгчид хөнгөлөлттэй">${esc(b.notes.join('\n'))}</textarea></div>
@@ -532,11 +562,11 @@ function collectCar() {
   return { id: curItem || '', name: g('name'), price: g('price').replace(/\D/g, ''), status: g('status'), kind: g('kind'), tag: g('tag'),
     kicker: g('kicker'), sub: g('sub'), order: Number(g('order')) || 99, visible: $('#c_visible').checked, featured: $('#c_featured').checked,
     heroDesktop: $('#i_heroDesktop').value, heroMobile: $('#i_heroMobile').value, cardImg: $('#i_cardImg').value,
-    gallery, keySpecs: ks, specs, brochure: $('#c_brochure').value };
+    gallery, keySpecs: ks, specs, brochure: $('#c_brochure').value, power: $('#c_power').value };
 }
 function collectBank() {
   const g = k => $('#b_' + k).value.trim();
-  return { id: curItem || '', name: g('name'), type: g('type'), rate: Number(g('rate').replace(',', '.')) || 0, downs: g('downs'), terms: g('terms'),
+  return { id: curItem || '', name: g('name'), type: g('type'), rate: Number(g('rate').replace(',', '.')) || 0, downs: g('downs'), terms: g('terms'), rules: collectRules(),
     notes: g('notes'), mark: g('mark') || g('name').slice(0, 1), order: Number(g('order')) || 99, visible: $('#b_visible').checked, logo: $('#i_logo').value };
 }
 async function saveCar() {
@@ -547,7 +577,7 @@ async function saveCar() {
 async function saveBank() {
   const o = collectBank();
   if (!o.name) return toast('Нэрийг бичнэ үү');
-  if (!(o.rate > 0)) return toast('Сарын хүүг бичнэ үү');
+  if (!(o.rate > 0) && !o.rules.length) return toast('Сарын хүү эсвэл хүүгийн нөхцөл бичнэ үү');
   await persist('apiSaveBank', o, 'banks');
 }
 async function persist(fn, o, key) {
@@ -569,6 +599,8 @@ $('#sheet').addEventListener('click', e => {
   if (up) { const k = up.dataset.up; pick(IMG[k].png ? 'image/png,image/jpeg,image/webp' : 'image/jpeg,image/png,image/webp', false, async f => { const url = await upload(f[0], IMG[k]); if (url) setSlot(k, url); }); }
   if (rm) setSlot(rm.dataset.rm, '');
   if (grm) grm.closest('.gi').remove();
+  if (e.target.id === 'ruleAdd') $('#rules').insertAdjacentHTML('beforeend', ruleRow());
+  const rrm = e.target.closest('[data-rrm]'); if (rrm) rrm.closest('.rule').remove();
 });
 $('#views').addEventListener('click', e => { const b = e.target.closest('button'); if (b && b.dataset.v !== VIEW) setView(b.dataset.v); });
 $('#cat').addEventListener('click', e => { const c = e.target.closest('.ccard'); if (c) (VIEW === 'cars' ? openCar : openBank)(c.dataset.id); });

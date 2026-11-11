@@ -7,10 +7,10 @@
 const SHEET_CARS = 'Машинууд';
 const SHEET_BANKS = 'Банкууд';
 const CAR_STATUSES = ['Бэлэн', 'Тун удахгүй', 'Захиалгаар', 'Зарагдсан'];
-const CAR_FIELDS = ['id', 'name', 'kind', 'tag', 'price', 'status', 'visible', 'featured', 'order', 'kicker', 'sub', 'heroDesktop', 'heroMobile', 'cardImg', 'gallery', 'keySpecs', 'specs', 'brochure', 'updated', 'updatedBy'];
-const CAR_HEADERS = ['ID', 'Нэр', 'Төрөл', 'Ангилал', 'Үнэ (₮)', 'Төлөв', 'Сайтад харуулах', 'Баннерт гаргах', 'Эрэмбэ', 'Баннерын дээд мөр', 'Тайлбар', 'Баннер — компьютер', 'Баннер — утас', 'Картын зураг', 'Цомог (JSON)', 'Гол үзүүлэлт (JSON)', 'Техникийн үзүүлэлт (JSON)', 'Танилцуулга PDF', 'Шинэчилсэн', 'Шинэчилсэн хүн'];
-const BANK_FIELDS = ['id', 'name', 'mark', 'type', 'rate', 'downs', 'terms', 'notes', 'logo', 'visible', 'order', 'updated', 'updatedBy'];
-const BANK_HEADERS = ['ID', 'Нэр', 'Товч тэмдэг', 'Зээлийн төрөл', 'Сарын хүү (%)', 'Урьдчилгаа (%)', 'Хугацаа (сар)', 'Нөхцөл (мөр бүрт нэг)', 'Лого', 'Сайтад харуулах', 'Эрэмбэ', 'Шинэчилсэн', 'Шинэчилсэн хүн'];
+const CAR_FIELDS = ['id', 'name', 'kind', 'tag', 'price', 'status', 'visible', 'featured', 'order', 'kicker', 'sub', 'heroDesktop', 'heroMobile', 'cardImg', 'gallery', 'keySpecs', 'specs', 'brochure', 'updated', 'updatedBy', 'power'];
+const CAR_HEADERS = ['ID', 'Нэр', 'Төрөл', 'Ангилал', 'Үнэ (₮)', 'Төлөв', 'Сайтад харуулах', 'Баннерт гаргах', 'Эрэмбэ', 'Баннерын дээд мөр', 'Тайлбар', 'Баннер — компьютер', 'Баннер — утас', 'Картын зураг', 'Цомог (JSON)', 'Гол үзүүлэлт (JSON)', 'Техникийн үзүүлэлт (JSON)', 'Танилцуулга PDF', 'Шинэчилсэн', 'Шинэчилсэн хүн', 'Хөдөлгүүр (EV / PHEV)'];
+const BANK_FIELDS = ['id', 'name', 'mark', 'type', 'rate', 'downs', 'terms', 'notes', 'logo', 'visible', 'order', 'updated', 'updatedBy', 'rules'];
+const BANK_HEADERS = ['ID', 'Нэр', 'Товч тэмдэг', 'Зээлийн төрөл', 'Сарын хүү (%)', 'Урьдчилгаа (%)', 'Хугацаа (сар)', 'Нөхцөл (мөр бүрт нэг)', 'Лого', 'Сайтад харуулах', 'Эрэмбэ', 'Шинэчилсэн', 'Шинэчилсэн хүн', 'Хүүгийн нөхцөл (JSON)'];
 const IMG_FOLDER_NAME = 'Tegri вэбсайт зураг';
 const SITE_CACHE_KEY = 'site-data-v1';
 
@@ -92,7 +92,8 @@ function setupCatalog() {
   const cars = ensureSheet_(ss, SHEET_CARS, CAR_HEADERS);
   const banks = ensureSheet_(ss, SHEET_BANKS, BANK_HEADERS);
   cars.getRange(2, 5, 500, 1).setNumberFormat('#,##0');
-  banks.getRange(2, 6, 500, 2).setNumberFormat('@'); // "10, 20, 30"-ийг огноо гэж ойлгохоос сэргийлнэ
+  banks.getRange(2, 6, 500, 2).setNumberFormat('@');
+  banks.getRange(2, BANK_FIELDS.length, 500, 1).setNumberFormat('@'); // "10, 20, 30"-ийг огноо гэж ойлгохоос сэргийлнэ
   // Өмнө нь огноо болж хадгалагдсан урьдчилгаа/хугацааг анхны утгаар засна
   if (banks.getLastRow() > 1) {
     const n = banks.getLastRow() - 1, vals = banks.getRange(2, 1, n, 7).getValues();
@@ -128,6 +129,7 @@ function readCars_() {
     c.keySpecs = parseJson_(r.keySpecs, []);
     c.specs = parseJson_(r.specs, []);
     c.updated = fmt_(r.updated, 'yyyy-MM-dd HH:mm');
+    c.power = r.power === 'EV' ? 'EV' : 'PHEV';
     ['name', 'kind', 'tag', 'status', 'kicker', 'sub', 'heroDesktop', 'heroMobile', 'cardImg', 'brochure', 'id', 'updatedBy'].forEach(f => { c[f] = String(r[f] || ''); });
     return c;
   }).sort((a, b) => a.order - b.order);
@@ -135,7 +137,7 @@ function readCars_() {
 function readBanks_() {
   return readRows_(SHEET_BANKS, BANK_FIELDS).map(r => ({
     id: String(r.id), name: String(r.name || ''), mark: String(r.mark || ''), type: String(r.type || ''),
-    rate: Number(r.rate) || 0, downs: nums_(r.downs), terms: nums_(r.terms),
+    rate: Number(r.rate) || 0, downs: nums_(r.downs, true), terms: nums_(r.terms), rules: cleanRules_(parseJson_(r.rules, [])),
     notes: String(r.notes || '').split('\n').map(s => s.trim()).filter(Boolean),
     logo: String(r.logo || ''), visible: r.visible === true || r.visible === 'TRUE', order: Number(r.order) || 99,
     updated: fmt_(r.updated, 'yyyy-MM-dd HH:mm'), updatedBy: String(r.updatedBy || '')
@@ -183,7 +185,7 @@ function cleanCar_(o) {
     gallery: list(o.gallery, ['label', 'url']).filter(g => g.url),
     keySpecs: list(o.keySpecs, ['value', 'unit', 'label']).slice(0, 4),
     specs: list(o.specs, ['label', 'value']),
-    updated: o.updated || '', updatedBy: o.updatedBy || ''
+    updated: o.updated || '', updatedBy: o.updatedBy || '', power: o.power === 'EV' ? 'EV' : 'PHEV'
   };
 }
 function carToRow_(c) {
@@ -192,20 +194,35 @@ function carToRow_(c) {
 function cleanBank_(o) {
   const url = String(o.logo || '').trim();
   const notes = Array.isArray(o.notes) ? o.notes.join('\n') : String(o.notes || '');
+  const rules = cleanRules_(o.rules);
   return {
     id: slug_(o.id || ''), name: safe_(o.name, 80), mark: safe_(o.mark, 3), type: safe_(o.type, 60),
-    rate: Math.round((Number(o.rate) || 0) * 1000) / 1000, downs: nums_(o.downs), terms: nums_(o.terms),
+    rate: rules.length ? Math.min.apply(null, rules.map(x => x.rate)) : Math.round((Number(o.rate) || 0) * 1000) / 1000,
+    downs: nums_(o.downs, true), terms: nums_(o.terms), rules: rules,
     notes: notes.split('\n').map(s => safe_(s, 160)).filter(Boolean).slice(0, 8).join('\n'),
     logo: /^https:\/\//.test(url) ? url.slice(0, 500) : '', visible: o.visible !== false, order: Number(o.order) || 99,
     updated: o.updated || '', updatedBy: o.updatedBy || ''
   };
 }
 function bankToRow_(b) {
-  return BANK_FIELDS.map(f => (f === 'downs' || f === 'terms') ? b[f].join(', ') : (b[f] === undefined || b[f] === null ? '' : b[f]));
+  return BANK_FIELDS.map(f => (f === 'downs' || f === 'terms') ? b[f].join(', ') : f === 'rules' ? JSON.stringify(b.rules || []) : (b[f] === undefined || b[f] === null ? '' : b[f]));
 }
-function nums_(v) {
-  const arr = Array.isArray(v) ? v : String(v || '').split(/[,\s]+/);
-  return arr.map(Number).filter(n => n > 0 && n < 1000).filter((n, i, a) => a.indexOf(n) === i).sort((a, b) => a - b);
+/** Хүүгийн нөхцөл: [{inc:'Цалин'|'Бизнес'|'Бүгд', max: сар хүртэл, car:'EV'|'PHEV'|'Бүгд', rate, rateMax}] */
+function cleanRules_(v) {
+  return (Array.isArray(v) ? v : []).slice(0, 20).map(x => {
+    const rate = Math.round((Number(x && x.rate) || 0) * 1000) / 1000;
+    const rm = Math.round((Number(x && x.rateMax) || 0) * 1000) / 1000;
+    return {
+      inc: ['Цалин', 'Бизнес'].indexOf(x && x.inc) >= 0 ? x.inc : 'Бүгд',
+      max: Math.min(240, Math.max(1, Math.round(Number(x && x.max) || 0))),
+      car: ['EV', 'PHEV'].indexOf(x && x.car) >= 0 ? x.car : 'Бүгд',
+      rate: rate, rateMax: rm > rate ? rm : ''
+    };
+  }).filter(x => x.rate > 0 && x.max > 0);
+}
+function nums_(v, zero) {
+  const arr = Array.isArray(v) ? v : String(v === null || v === undefined ? '' : v).split(/[,\s]+/).filter(x => x !== '');
+  return arr.map(Number).filter(n => (zero ? n >= 0 : n > 0) && n < 1000).filter((n, i, a) => a.indexOf(n) === i).sort((a, b) => a - b);
 }
 function parseJson_(v, d) { try { const x = JSON.parse(String(v || '')); return Array.isArray(x) ? x : d; } catch (e) { return d; } }
 function slug_(s) {
@@ -249,7 +266,8 @@ const CATALOG_SEED = {
    "keySpecs": [],
    "specs": [],
    "brochure": "",
-   "visible": true
+   "visible": true,
+   "power": "PHEV"
   },
   {
    "id": "seal-5",
@@ -307,14 +325,15 @@ const CATALOG_SEED = {
     }
    ],
    "brochure": "",
-   "visible": true
+   "visible": true,
+   "power": "PHEV"
   },
   {
    "id": "yuan-up",
    "name": "BYD Yuan Up",
    "kind": "Кроссовер · Цахилгаан",
    "tag": "Цахилгаан",
-   "price": "",
+   "price": 79000000,
    "status": "Бэлэн",
    "featured": true,
    "order": 3,
@@ -327,7 +346,8 @@ const CATALOG_SEED = {
    "keySpecs": [],
    "specs": [],
    "brochure": "",
-   "visible": true
+   "visible": true,
+   "power": "EV"
   },
   {
    "id": "ti-7",
@@ -347,7 +367,8 @@ const CATALOG_SEED = {
    "keySpecs": [],
    "specs": [],
    "brochure": "",
-   "visible": true
+   "visible": true,
+   "power": "PHEV"
   },
   {
    "id": "sealion-06-dm-i",
@@ -367,38 +388,11 @@ const CATALOG_SEED = {
    "keySpecs": [],
    "specs": [],
    "brochure": "",
-   "visible": true
+   "visible": true,
+   "power": "PHEV"
   }
  ],
  "banks": [
-  {
-   "id": "khan",
-   "name": "Хаан банк",
-   "mark": "Х",
-   "type": "Ногоон зээл",
-   "rate": 1.25,
-   "downs": [
-    10,
-    20,
-    30,
-    40
-   ],
-   "terms": [
-    24,
-    36,
-    48,
-    60,
-    72,
-    84,
-    96
-   ],
-   "notes": [
-    "Цахилгаан ба хосолмол машинд"
-   ],
-   "logo": "",
-   "order": 1,
-   "visible": true
-  },
   {
    "id": "golomt",
    "name": "Голомт банк",
@@ -406,12 +400,15 @@ const CATALOG_SEED = {
    "type": "Ногоон зээл",
    "rate": 1.3,
    "downs": [
-    10,
     20,
-    30
+    30,
+    40,
+    50,
+    60,
+    70
    ],
    "terms": [
-    24,
+    30,
     36,
     48,
     60,
@@ -419,12 +416,30 @@ const CATALOG_SEED = {
     84,
     96
    ],
+   "rules": [
+    {
+     "inc": "Цалин",
+     "max": 30,
+     "car": "Бүгд",
+     "rate": 1.3,
+     "rateMax": 1.6
+    },
+    {
+     "inc": "Бизнес",
+     "max": 96,
+     "car": "Бүгд",
+     "rate": 1.3,
+     "rateMax": 1.6
+    }
+   ],
    "notes": [
-    "Цахилгаан ба хосолмол машинд"
+    "Урьдчилгаа 20%-аас. Үл хөдлөх хөрөнгө барьцаалбал урьдчилгаагүй.",
+    "Хүү 1.3–1.6%, зээлдэгчийн скорингоос хамаарна.",
+    "Цалингийн орлоготой 30 сар хүртэл, бизнесийн орлоготой 96 сар хүртэл."
    ],
    "logo": "",
-   "order": 2,
-   "visible": true
+   "visible": true,
+   "order": 1
   },
   {
    "id": "tdb",
@@ -433,11 +448,17 @@ const CATALOG_SEED = {
    "type": "Ногоон зээл",
    "rate": 1.3,
    "downs": [
+    0,
     10,
     20,
-    30
+    30,
+    40,
+    50,
+    60,
+    70
    ],
    "terms": [
+    30,
     36,
     48,
     60,
@@ -445,34 +466,142 @@ const CATALOG_SEED = {
     84,
     96
    ],
+   "rules": [
+    {
+     "inc": "Цалин",
+     "max": 30,
+     "car": "EV",
+     "rate": 1.3,
+     "rateMax": ""
+    },
+    {
+     "inc": "Цалин",
+     "max": 30,
+     "car": "PHEV",
+     "rate": 1.6,
+     "rateMax": ""
+    },
+    {
+     "inc": "Бизнес",
+     "max": 96,
+     "car": "EV",
+     "rate": 1.3,
+     "rateMax": ""
+    },
+    {
+     "inc": "Бизнес",
+     "max": 96,
+     "car": "PHEV",
+     "rate": 1.6,
+     "rateMax": ""
+    }
+   ],
    "notes": [
-    "Цахилгаан ба хосолмол машинд"
+    "Урьдчилгаагүй (0%) авах боломжтой.",
+    "Хүү: цэвэр цахилгаан (EV) 1.3%, хосолмол (PHEV) 1.6%.",
+    "Цалингийн орлоготой 30 сар хүртэл, бизнесийн орлоготой (бизнесдээ ашиглах) 96 сар хүртэл."
    ],
    "logo": "",
-   "order": 3,
-   "visible": true
+   "visible": true,
+   "order": 2
   },
   {
    "id": "tdb-leasing",
    "name": "Төрийн банк — санхүүгийн түрээс",
    "mark": "ТЛ",
    "type": "Санхүүгийн түрээс",
+   "rate": 1.2,
+   "downs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70
+   ],
+   "terms": [
+    30,
+    36,
+    48,
+    60,
+    72,
+    84,
+    96
+   ],
+   "rules": [
+    {
+     "inc": "Бизнес",
+     "max": 96,
+     "car": "EV",
+     "rate": 1.2,
+     "rateMax": ""
+    }
+   ],
+   "notes": [
+    "Зөвхөн бизнесийн орлоготой, цэвэр цахилгаан (EV) машинд.",
+    "Урьдчилгаа 10–20%-аас, хүү 1.2%, 96 сар хүртэл.",
+    "Зөвхөн Хүннү Моллын эсрэг талд байрлах Бэлманто салбар дээр судлагдана."
+   ],
+   "logo": "",
+   "visible": true,
+   "order": 3
+  },
+  {
+   "id": "khan",
+   "name": "Хаан банк",
+   "mark": "Х",
+   "type": "Ногоон зээл",
    "rate": 1.3,
    "downs": [
     10,
     20,
-    30
+    30,
+    40,
+    50,
+    60,
+    70
    ],
    "terms": [
-    24,
+    30,
     36,
     48,
-    60
+    60,
+    72,
+    84,
+    96
    ],
-   "notes": [],
+   "rules": [
+    {
+     "inc": "Цалин",
+     "max": 30,
+     "car": "Бүгд",
+     "rate": 1.35,
+     "rateMax": ""
+    },
+    {
+     "inc": "Цалин",
+     "max": 60,
+     "car": "Бүгд",
+     "rate": 1.4,
+     "rateMax": ""
+    },
+    {
+     "inc": "Бизнес",
+     "max": 96,
+     "car": "Бүгд",
+     "rate": 1.3,
+     "rateMax": ""
+    }
+   ],
+   "notes": [
+    "Урьдчилгаа 10%-аас.",
+    "Цалингийн орлоготой: 30 сар хүртэл 1.35%, 31–60 сар 1.4%.",
+    "Бизнесийн орлоготой: 96 сар хүртэл 1.3%."
+   ],
    "logo": "",
-   "order": 4,
-   "visible": true
+   "visible": true,
+   "order": 4
   },
   {
    "id": "arig",
@@ -492,10 +621,13 @@ const CATALOG_SEED = {
     60,
     72
    ],
-   "notes": [],
+   "rules": [],
+   "notes": [
+    "Нөхцөл бөглөгдөөгүй"
+   ],
    "logo": "",
-   "order": 5,
-   "visible": true
+   "visible": false,
+   "order": 5
   },
   {
    "id": "bers",
@@ -514,10 +646,13 @@ const CATALOG_SEED = {
     36,
     48
    ],
-   "notes": [],
+   "rules": [],
+   "notes": [
+    "Нөхцөл бөглөгдөөгүй"
+   ],
    "logo": "",
-   "order": 6,
-   "visible": true
+   "visible": false,
+   "order": 6
   }
  ]
 };
