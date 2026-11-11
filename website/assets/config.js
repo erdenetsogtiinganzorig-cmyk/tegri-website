@@ -9,5 +9,14 @@ window.TEGRI_CONFIG = {
   address: 'ХУД, 20-р хороо, Чингисийн өргөн чөлөө, UG Motors, 4 давхар',
   facebook: 'https://www.facebook.com/Tegrimotors',
   gifts: ['3 жил / 100,000 км баталгаа', 'Гэрийн ханын цэнэглэгч', '4 өвлийн дугуй', 'Улсын дугаарын хүрээ', 'Шалавч', 'Борооны хаалт'],
-  callbackText: 'ажлын цагаар 1 цагийн дотор'
+  callbackText: 'ажлын цагаар 1 цагийн дотор',
+  /* Шоурүүм: image — зургийн зам (assets/img/showroom.jpg), mapsUrl — Google Maps-ийн "Share" холбоос, hours — ажлын цаг */
+  showroom: {
+    title: 'Шоурүүмд зочлоорой',
+    text: 'Машинуудыг биеэр үзэж, туршилтын жолоодлого хийх боломжтой. Манай зөвлөхүүд зээлийн нөхцөл, бэлгийн багцын талаар дэлгэрэнгүй танилцуулна.',
+    image: '',
+    mapsUrl: '',
+    mapsQuery: 'UG Motors Ulaanbaatar',
+    hours: ''
+  }
 };

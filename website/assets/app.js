@@ -8,6 +8,12 @@
   var tel = function (p) { return 'tel:' + String(p).replace(/\D/g, ''); };
   var ARROW = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
   var PREV = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>';
+  var DL = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>';
+  var PIN = '<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>';
+  var PHONE = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>';
+  var MAIL = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>';
+  var CLOCK = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+  var FB = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-7.5H16l.5-3h-3V8.6c0-.9.3-1.6 1.6-1.6h1.6V4.3c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4V10.5H8v3h2.5V21z"/></svg>';
   var NEXT = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
   var CHECK = '<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1ec8f0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 
@@ -52,17 +58,22 @@
     h.className = 'hdr' + (solid ? ' solid' : '');
     h.innerHTML = '<div class="hdr-in">' +
       '<a class="hdr-logo" href="index.html" aria-label="Tegri Motors нүүр"><img src="assets/img/logo.png" alt="Tegri EV Motors" width="141" height="40"></a>' +
-      '<nav class="nav" aria-label="Үндсэн цэс"><a href="index.html#cars">Машинууд</a><a href="index.html#loan">Зээл</a><a href="index.html#why">Баталгаа ба бэлэг</a><a href="#contact">Холбоо барих</a></nav>' +
+      '<nav class="nav" aria-label="Үндсэн цэс"><a href="index.html#cars">Машинууд</a><a href="index.html#why">Баталгаа ба бэлэг</a><a href="index.html#showroom">Шоурүүм</a><a href="#contact">Холбоо барих</a></nav>' +
       '<a class="hdr-phone" href="' + tel(C.phones[0]) + '">' + esc(C.phones[0]) + '</a>' +
       '<a class="btn btn-cyan hdr-cta" href="#contact" data-intent="Туршилтын жолоодлого">Туршилтын жолоодлого</a>' +
       '<button class="menu-btn" type="button" aria-label="Цэс нээх" aria-expanded="false"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>' +
       '</div>';
     var dr = document.createElement('div');
     dr.className = 'drawer'; dr.setAttribute('role', 'dialog'); dr.setAttribute('aria-label', 'Цэс');
-    dr.innerHTML = '<button class="close" type="button" aria-label="Цэс хаах">×</button><a href="index.html#cars">Машинууд</a><a href="index.html#loan">Зээл</a><a href="index.html#why">Баталгаа ба бэлэг</a><a href="#contact">Холбоо барих</a><a href="' + tel(C.phones[0]) + '">☎ ' + esc(C.phones[0]) + '</a>';
+    dr.innerHTML = '<div class="drawer-top"><img src="assets/img/logo.png" alt="Tegri EV Motors" width="106" height="30"><button class="close" type="button" aria-label="Цэс хаах">×</button></div><a href="index.html#cars">Машинууд</a><a href="index.html#why">Баталгаа ба бэлэг</a><a href="index.html#showroom">Шоурүүм</a><a href="#contact">Холбоо барих</a><a href="' + tel(C.phones[0]) + '">☎ ' + esc(C.phones[0]) + '</a>';
     var btn = $('.menu-btn', h);
-    var close = function () { dr.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); };
-    btn.onclick = function () { dr.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); };
+    var close = function () { dr.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); document.documentElement.classList.remove('lock'); };
+    btn.onclick = function () { dr.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); document.documentElement.classList.add('lock'); };
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+    if (!solid) {
+      var onScroll = function () { h.classList.toggle('scrolled', window.scrollY > 40); };
+      window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+    }
     $('.close', dr).onclick = close;
     dr.addEventListener('click', function (e) { if (e.target.tagName === 'A') close(); });
     document.body.prepend(dr);
@@ -71,15 +82,19 @@
   function footer() {
     var f = document.createElement('footer');
     f.className = 'ftr';
-    f.innerHTML = '<div class="wrap ftr-in"><img src="assets/img/logo.png" alt="Tegri EV Motors" width="113" height="32">' +
-      '<div class="ftr-col"><span>' + esc(C.address) + '</span><span>' + C.phones.map(function (p) { return '<a href="' + tel(p) + '">' + esc(p) + '</a>'; }).join(' · ') + '</span><span><a href="mailto:' + esc(C.email) + '">' + esc(C.email) + '</a></span></div>' +
-      '<div class="ftr-col"><a href="' + esc(C.facebook) + '" rel="noopener">Facebook</a><span>© ' + new Date().getFullYear() + ' ' + esc(C.company) + '</span></div></div>';
+    var SR = C.showroom || {};
+    f.innerHTML = '<div class="wrap"><div class="ftr-grid">' +
+      '<div class="ftr-brand"><img src="assets/img/logo.png" alt="Tegri EV Motors" width="141" height="40"><p>Шинэ, 0 км цахилгаан ба plug-in hybrid машин. Баталгаа, бэлэг, банкны зээлтэй.</p>' +
+      '<a class="ftr-social" href="' + esc(C.facebook) + '" target="_blank" rel="noopener">' + FB + '<span>Facebook</span></a></div>' +
+      '<div class="ftr-col"><h3>Холбоо барих</h3><div class="ftr-phones">' + C.phones.map(function (p) { return '<a class="ftr-phone" href="' + tel(p) + '">' + PHONE + '<span>' + esc(p) + '</span></a>'; }).join('') + '</div>' +
+      '<a class="ftr-line" href="mailto:' + esc(C.email) + '">' + MAIL + '<span>' + esc(C.email) + '</span></a></div>' +
+      '<div class="ftr-col"><h3>Шоурүүм</h3><a class="ftr-line" href="' + esc(mapsUrl()) + '" target="_blank" rel="noopener">' + PIN + '<span>' + esc(C.address) + '</span></a>' +
+      (SR.hours ? '<span class="ftr-line">' + CLOCK + '<span>' + esc(SR.hours) + '</span></span>' : '') + '</div>' +
+      '</div><div class="ftr-bottom"><span>© ' + new Date().getFullYear() + ' ' + esc(C.company) + '</span><span>tegrimotors.mn</span></div></div>';
     document.body.appendChild(f);
-    var bar = document.createElement('div');
-    bar.className = 'bar';
-    bar.innerHTML = '<a class="btn btn-ghost-light" href="' + tel(C.phones[0]) + '">Залгах</a><a class="btn btn-cyan" href="#contact">Мэдээлэл авах</a>';
-    document.body.appendChild(bar);
   }
+  function mapsUrl() { var SR = C.showroom || {}; return SR.mapsUrl || 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(SR.mapsQuery || C.address); }
+  function dlLabel(c) { return DL + '<span>Танилцуулга татах (PDF)</span>'; }
   function statusHtml(s) { return s ? '<span class="status' + (s === 'Бэлэн' ? ' ok' : '') + '">' + esc(s) + '</span>' : ''; }
   function priceText(c) { return c.price ? fmt(c.price) : 'Үнэ лавлах'; }
   function carUrl(c) { return 'car.html?id=' + encodeURIComponent(c.id); }
@@ -90,14 +105,12 @@
     var models = (opts.cars || []).map(function (c) { return '<option' + (opts.car && opts.car.id === c.id ? ' selected' : '') + '>' + esc(c.name) + '</option>'; }).join('');
     el.innerHTML =
       '<div class="wrap contact-in"><div class="contact-txt"><h2 class="h2" id="contact-h">' + esc(opts.title || 'Мэдээлэл авах') + '</h2>' +
-      '<p>Утасны дугаараа үлдээгээрэй. Манай зөвлөх ' + esc(C.callbackText) + ' холбогдож, үнэ, зээлийн нөхцөл, туршилтын жолоодлогын цагийг тохирно.</p>' +
-      '<div class="contact-meta"><span>' + esc(C.address) + '</span><span>' + C.phones.map(function (p) { return '<a href="' + tel(p) + '">' + esc(p) + '</a>'; }).join(' · ') + '</span><span><a href="mailto:' + esc(C.email) + '">' + esc(C.email) + '</a></span></div></div>' +
+      '<p>Утасны дугаараа үлдээгээрэй. Манай зөвлөх ' + esc(C.callbackText) + ' холбогдож, үнэ, зээлийн нөхцөл, туршилтын жолоодлогын цагийг тохирно.</p></div>' +
       '<form class="form" novalidate>' +
       '<div class="field full"><label for="cf-phone">Утасны дугаар *</label><input id="cf-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="8888 8888" required><span class="err" hidden>8 оронтой утасны дугаар оруулна уу</span></div>' +
       '<div class="field"><label for="cf-name">Нэр</label><input id="cf-name" name="name" autocomplete="name" placeholder="Заавал биш"></div>' +
       '<div class="field"><label for="cf-model">Сонирхсон загвар</label><select id="cf-model" name="model">' + models + '<option>Шийдээгүй байна</option></select></div>' +
       '<div class="field full"><label for="cf-want">Юу сонирхож байна</label><select id="cf-want" name="intent"><option>Мэдээлэл авах</option><option>Туршилтын жолоодлого</option><option>Зээлийн нөхцөл</option><option>Танилцуулга авах</option><option>Бусад</option></select></div>' +
-      '<fieldset class="field full radios"><legend class="legend">Төлбөр</legend><label><input type="radio" name="payment" value="Бэлэн" checked> Бэлэн</label><label><input type="radio" name="payment" value="Зээл"> Зээл</label><label><input type="radio" name="payment" value="Тодорхойгүй"> Мэдэхгүй</label></fieldset>' +
       '<button class="btn btn-cyan btn-block field full" type="submit">Илгээх</button></form></div>';
     var form = $('form', el);
     form.addEventListener('submit', function (e) {
@@ -107,7 +120,7 @@
       if (!phoneOk(fd.get('phone'))) { err.hidden = false; $('#cf-phone').focus(); return; }
       err.hidden = true;
       var btn = $('button[type=submit]', form); btn.disabled = true; btn.textContent = 'Илгээж байна…';
-      sendLead({ type: fd.get('intent'), phone: fd.get('phone'), name: fd.get('name'), model: fd.get('model'), payment: fd.get('payment') }).then(function () {
+      sendLead({ type: fd.get('intent'), phone: fd.get('phone'), name: fd.get('name'), model: fd.get('model') }).then(function () {
         form.innerHTML = '<div class="done" role="status"><h3>Баярлалаа!</h3><p>Таны хүсэлтийг хүлээж авлаа. Манай зөвлөх ' + esc(C.callbackText) + ' холбогдоно.</p></div>';
       });
     });
@@ -135,7 +148,7 @@
         '<div class="hero-in"><div class="hero-txt"><p class="kicker">' + esc(c.kicker || c.kind) + '</p><h1>' + esc(c.name) + '</h1>' +
         (c.sub ? '<p class="hero-sub">' + esc(c.sub) + '</p>' : '') +
         (c.price ? '<p class="hero-price">' + fmt(c.price) + '</p>' : '') +
-        '<div class="hero-cta">' + (c.brochure ? '<a class="btn btn-cyan" href="' + esc(c.brochure) + '" target="_blank" rel="noopener">Танилцуулга татах</a>' : '<a class="btn btn-cyan" href="#contact" data-intent="Танилцуулга авах">Танилцуулга авах</a>') +
+        '<div class="hero-cta">' + (c.brochure ? '<a class="btn btn-cyan" href="' + esc(c.brochure) + '" target="_blank" rel="noopener">' + dlLabel(c) + '</a>' : '<a class="btn btn-cyan" href="#contact" data-intent="Танилцуулга авах">Танилцуулга авах</a>') +
         '<a class="link-arrow" href="' + carUrl(c) + '">Дэлгэрэнгүй үзэх ' + ARROW + '</a></div></div>' +
         (slides.length > 1 ? '<div class="hero-nav"><div class="tabs" role="tablist" aria-label="Загвар сонгох">' +
           slides.map(function (s, k) { return '<button class="tab" role="tab" type="button" aria-selected="' + (k === i) + '" data-k="' + k + '">' + esc(s.name.replace(/^BYD\s+/, '')) + '</button>'; }).join('') +
@@ -176,14 +189,14 @@
     });
     drawCars();
 
-    // Зээлийн товч жишээ
-    var t = $('#loan'), offer = null, c = null;
-    cars.filter(function (x) { return x.price; }).some(function (x) { offer = bestOffer(x, data.banks); c = x; return offer; });
-    if (offer) {
-      t.innerHTML = '<div class="wrap"><div class="teaser-box"><div><h2>' + esc(c.name) + ' — сард <span style="color:var(--cyan-text)">≈ ' + fmt(offer.m) + '</span>-өөр</h2>' +
-        '<p>' + esc(offer.b.name) + ', ' + offer.d + '% урьдчилгаа, сарын ' + offer.r.min + '%, ' + offer.t + ' сар' + (offer.inc === 'Бизнес' ? ' (бизнесийн орлоготой)' : '') + '. Жишээ тооцоо, эцсийн нөхцөлийг банк тогтооно.</p></div>' +
-        '<a class="btn btn-cyan" href="' + carUrl(c) + '#calc">Зээлээ тооцоолох</a></div></div>';
-    } else t.remove();
+    // Шоурүүм
+    var SR = C.showroom || {}, sr = $('#showroom');
+    if (sr) sr.innerHTML = '<div class="wrap"><div class="sr-box"><div class="sr-img">' +
+      (SR.image ? '<img src="' + esc(SR.image) + '" alt="' + esc(SR.title || 'Tegri Motors шоурүүм') + '" loading="lazy">' : '<div class="sr-ph">' + PIN + '<span>Шоурүүмийн зураг</span></div>') + '</div>' +
+      '<div class="sr-txt"><span class="eyebrow">Шоурүүм</span><h2 class="h2" id="showroom-h">' + esc(SR.title || 'Шоурүүмд зочлоорой') + '</h2>' +
+      '<p>' + esc(SR.text || 'Машинуудыг биеэр үзэж, туршилтын жолоодлого хийх боломжтой.') + '</p>' +
+      '<ul class="sr-meta"><li>' + PIN + '<span>' + esc(C.address) + '</span></li>' + (SR.hours ? '<li>' + CLOCK + '<span>' + esc(SR.hours) + '</span></li>' : '') + '</ul>' +
+      '<a class="btn btn-dark" href="' + esc(mapsUrl()) + '" target="_blank" rel="noopener">' + PIN + '<span>Байршил харах</span></a></div></div></div>';
 
     contactForm($('#contact'), { cars: cars, title: 'Үнийн санал, мэдээлэл авах' });
     footer();
@@ -246,7 +259,7 @@
       '<aside class="aside"><span class="kicker">' + esc(car.kicker || car.kind) + '</span><h1>' + esc(car.name) + '</h1>' +
       '<div><div class="small">Үнэ, НӨАТ орсон</div><div class="big">' + priceText(car) + '</div>' + teaser + '</div>' + statusHtml(car.status) +
       '<a class="btn btn-cyan btn-block" href="#contact" data-intent="Туршилтын жолоодлого">Туршилтын жолоодлого товлох</a>' +
-      (car.brochure ? '<a class="dl-btn" href="' + esc(car.brochure) + '" target="_blank" rel="noopener">⬇ Танилцуулга татах (PDF)</a>' : '<a class="dl-btn" href="#contact" data-intent="Танилцуулга авах">Танилцуулга авах</a>') +
+      (car.brochure ? '<a class="dl-btn" href="' + esc(car.brochure) + '" target="_blank" rel="noopener">' + dlLabel(car) + '</a>' : '<a class="dl-btn" href="#contact" data-intent="Танилцуулга авах">Танилцуулга авах</a>') +
       '<ul><li>✓ ' + esc(C.gifts[0]) + '</li><li>✓ Бэлгийн багц машин бүрт</li><li>✓ Банк, ББСБ-ын зээл</li></ul></aside></div></div></section>' +
       ((car.keySpecs || []).length ? '<section class="keyspecs" aria-label="Гол үзүүлэлтүүд"><div class="keyspecs-in wrap">' + car.keySpecs.map(function (k) { return '<div><div class="ks-v">' + esc(k.value) + ' <small>' + esc(k.unit || '') + '</small></div><div class="ks-l">' + esc(k.label) + '</div></div>'; }).join('') + '</div></section>' : '') +
       (car.price && banks.length ? '<section class="calc" id="calc" aria-labelledby="calc-h"><div class="wrap"><h2 class="h2" id="calc-h">Зээлийн тооцоолуур</h2><p class="lead">Гэрээт банк, ББСБ-аа сонгоод урьдчилгаа, хугацаагаа тохируулна уу.</p><div class="banks" role="tablist" aria-label="Гэрээт байгууллагууд"></div><div class="calc-grid" id="calc-body"></div></div></section>' : '') +
