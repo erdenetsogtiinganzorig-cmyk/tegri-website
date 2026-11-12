@@ -231,9 +231,10 @@ function visible() {
     if (q && [l.name, l.phone, l.email, l.model, l.id].join(' ').toLowerCase().indexOf(q) < 0) return false;
     return true;
   });
-  return v.sort((a, b) => (irank(a.interest) - irank(b.interest)) || (F.quick === 'due'
+  // Хамгийн сүүлд бүртгэгдсэн нь эхэндээ (Хугацаа хэтэрсэн шүүлтүүрт — огноогоор)
+  return v.sort((a, b) => F.quick === 'due'
     ? String(a.actionDate).localeCompare(String(b.actionDate))
-    : String(b.created).localeCompare(String(a.created))));
+    : String(b.created).localeCompare(String(a.created)));
 }
 
 function card(l) {
@@ -358,8 +359,10 @@ const IMG = {
   logo: { t: 'Лого', s: 'PNG, тунгалаг дэвсгэртэй байвал сайн', w: 400, h: 400, png: true }
 };
 const money = n => n ? Number(n).toLocaleString('en-US').replace(/,/g, ',') + '₮' : 'Үнэ оруулаагүй';
-const isUrl = u => /^https:\/\//.test(u || '');
-const bg = u => isUrl(u) ? `background-image:url('${esc(u)}')` : '';
+const SITE_URL = 'https://tegrimotors.mn/';
+const abs = u => /^assets\//.test(u || '') ? SITE_URL + u : (u || '');
+const isUrl = u => /^(https:\/\/|assets\/)/.test(u || '');
+const bg = u => isUrl(u) ? `background-image:url('${esc(abs(u))}')` : '';
 
 function setView(v) {
   VIEW = v;
