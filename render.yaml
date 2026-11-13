@@ -8,6 +8,3 @@ services:
       - path: /assets/*
         name: Cache-Control
         value: public, max-age=300
-      - path: /_crm/*
-        name: Access-Control-Allow-Origin
-        value: "*"
