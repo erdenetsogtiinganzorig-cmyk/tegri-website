@@ -105,7 +105,8 @@ h3{font-size:14px;margin:22px 0 8px}
 .chk{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink);margin:0}
 .chk input{width:20px;height:20px;flex:0 0 20px}
 .btn.del{background:none;color:var(--red);border:1px solid #fecaca;margin-top:10px}
-.busy{opacity:.6;pointer-events:none}
+.busy{pointer-events:none}
+.busy>*{opacity:.45;transition:opacity .2s}
 .rule{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 28px;gap:6px;padding:8px 0;border-bottom:1px dashed var(--line);align-items:center}
 .rule select,.rule input{padding:8px 6px}
 .rule .ln{grid-column:1/-1;display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);flex-wrap:wrap}
